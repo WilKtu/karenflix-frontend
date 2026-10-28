@@ -51,8 +51,7 @@
     </section>
 
     <section class="section" id="catalogo" aria-labelledby="catalog-title">
-      <div class="section__heading">
-        <div><p class="eyebrow">DESCUBRE ALGO NUEVO</p><h2 id="catalog-title">Explora el catálogo</h2></div>
+      <div class="catalog-controls">
         <label class="filter-label" for="genre-filter">Género
           <select id="genre-filter">
             <option value="todos">Todos</option>
@@ -63,9 +62,59 @@
             <option value="Animación">Animación</option>
           </select>
         </label>
+        <label class="filter-label" for="type-filter">Tipo
+          <select id="type-filter">
+            <option value="todos">Todos</option>
+            <option value="Serie">Serie</option>
+            <option value="Película">Película</option>
+            <option value="Documental">Documental</option>
+          </select>
+        </label>
+        <label class="filter-label" for="sort-filter">Ordenar por
+          <select id="sort-filter">
+            <option value="relevance">Relevancia</option>
+            <option value="rating-desc">Mejor calificación</option>
+            <option value="year-desc">Más recientes</option>
+            <option value="title-asc">Título A–Z</option>
+          </select>
+        </label>
       </div>
       <div class="card-grid" id="catalog-list" aria-live="polite"></div>
       <p class="empty-state" id="empty-state" hidden>No se encontraron títulos con esos criterios.</p>
+      <div class="pagination" id="pagination" aria-label="Paginación del catálogo">
+        <button class="button button--subtle" id="prev-page" type="button">Anterior</button>
+        <span id="page-status" aria-live="polite">Página 1 de 1</span>
+        <button class="button button--subtle" id="next-page" type="button">Siguiente</button>
+      </div>
+    </section>
+    <section class="section reviews-section" id="resenas" aria-labelledby="reviews-title">
+      <div class="section__heading">
+        <div><p class="eyebrow">COMUNIDAD</p><h2 id="reviews-title">Reseñas de prueba</h2></div>
+        <span class="section__hint">Puedes crear, editar o eliminar tus reseñas locales.</span>
+      </div>
+      <form class="review-form" id="review-form">
+        <input type="hidden" id="review-id">
+        <label for="review-title">Título de contenido
+          <select id="review-title" required></select>
+        </label>
+        <label for="review-rating">Calificación
+          <select id="review-rating" required>
+            <option value="5">5 — Excelente</option>
+            <option value="4">4 — Muy bueno</option>
+            <option value="3">3 — Bueno</option>
+            <option value="2">2 — Regular</option>
+            <option value="1">1 — Malo</option>
+          </select>
+        </label>
+        <label class="review-form__text" for="review-text">Reseña
+          <textarea id="review-text" rows="3" maxlength="500" placeholder="Comparte tu opinión (máximo 500 caracteres)" required></textarea>
+        </label>
+        <div class="review-form__actions">
+          <button class="button button--primary" id="review-submit" type="submit">Publicar reseña</button>
+          <button class="button button--subtle" id="review-cancel" type="button" hidden>Cancelar edición</button>
+        </div>
+      </form>
+      <div id="review-list" class="review-list" aria-live="polite"></div>
     </section>
   </main>
 
