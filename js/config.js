@@ -9,3 +9,4 @@ export const APP_CONFIG = Object.freeze({
   USE_MOCK_DATA: true,
   DEFAULT_LANGUAGE: "es"
 });
+
