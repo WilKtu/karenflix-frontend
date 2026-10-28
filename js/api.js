@@ -1,5 +1,6 @@
 import { APP_CONFIG } from "./config.js";
 
+
 export async function apiRequest(path, options = {}) {
   if (APP_CONFIG.USE_MOCK_DATA) {
     throw new Error("El modo de prueba está activo. Conecta el backend y cambia USE_MOCK_DATA a false.");
