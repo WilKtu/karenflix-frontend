@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Prototipo de plataforma de contenido audiovisual.">
+  <title>KAREN-FLIX — Explora contenido</title>
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <script type="module" src="./js/ui.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Nébula, inicio">KAREN-FLIX<span>+</span></a>
+    <nav class="nav" aria-label="Navegación principal">
+      <a class="nav__link nav__link--active" href="#inicio">Inicio</a>
+      <a class="nav__link" href="#populares">Populares</a>
+      <a class="nav__link" href="#catalogo">Catálogo</a>
+    </nav>
+    <form class="search" id="search-form" role="search">
+      <label class="sr-only" for="search-input">Buscar contenido</label>
+      <input id="search-input" type="search" placeholder="Buscar títulos..." autocomplete="off">
+      <button class="button button--subtle" type="submit">Buscar</button>
+    </form>
+  </header>
+
+  <main id="inicio">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__content">
+        <p class="eyebrow">RECOMENDACIÓN DE LA SEMANA</p>
+        <h1 id="hero-title">Más historias.<br>Otros universos.</h1>
+        <p class="hero__description">Explora historias, documentales y aventuras seleccionadas para ti.</p>
+        <div class="hero__actions">
+          <a class="button button--primary" href="#catalogo">Explorar catálogo</a>
+          <a class="button button--outline" href="#populares">Ver populares</a>
+        </div>
+      </div>
+      <div class="hero__art" aria-hidden="true">
+        <div class="orb orb--one"></div><div class="orb orb--two"></div>
+        <div class="hero__poster"><span>KAREN-FLIX</span><strong>ODISEA<br>ESTELAR</strong><small>UNA HISTORIA ORIGINAL</small></div>
+      </div>
+    </section>
+
+    <section class="section" id="populares" aria-labelledby="popular-title">
+      <div class="section__heading">
+        <div><p class="eyebrow">LO MÁS VISTO</p><h2 id="popular-title">Populares ahora</h2></div>
+        <span class="section__hint">Selección de prueba</span>
+      </div>
+      <div class="card-grid" id="popular-list" aria-live="polite"></div>
+    </section>
+
+    <section class="section" id="catalogo" aria-labelledby="catalog-title">
+      <div class="section__heading">
+        <div><p class="eyebrow">DESCUBRE ALGO NUEVO</p><h2 id="catalog-title">Explora el catálogo</h2></div>
+        <label class="filter-label" for="genre-filter">Género
+          <select id="genre-filter">
+            <option value="todos">Todos</option>
+            <option value="Ciencia ficción">Ciencia ficción</option>
+            <option value="Documental">Documental</option>
+            <option value="Drama">Drama</option>
+            <option value="Aventura">Aventura</option>
+            <option value="Animación">Animación</option>
+          </select>
+        </label>
+      </div>
+      <div class="card-grid" id="catalog-list" aria-live="polite"></div>
+      <p class="empty-state" id="empty-state" hidden>No se encontraron títulos con esos criterios.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a class="brand brand--small" href="#inicio">KAREN-FLIX<span>+</span></a>
+    <p>Prototipo académico · Datos sintéticos para pruebas · No es un servicio real.</p>
+  </footer>
+</body>
+</html>
