@@ -1,126 +1,100 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Prototipo de plataforma de contenido audiovisual.">
-  <title>KAREN-FLIX — Explora contenido</title>
-  <link rel="stylesheet" href="./css/variables.css">
-  <link rel="stylesheet" href="./css/base.css">
-  <link rel="stylesheet" href="./css/components.css">
-  <script type="module" src="./js/ui.js"></script>
+  <title>KAREN-FLIX - Descubre películas y series</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="#" aria-label="Nébula, inicio">KAREN-FLIX<span>+</span></a>
-    <nav class="nav" aria-label="Navegación principal">
-      <a class="nav__link nav__link--active" href="#inicio">Inicio</a>
-      <a class="nav__link" href="#populares">Populares</a>
-      <a class="nav__link" href="#catalogo">Catálogo</a>
-    </nav>
-    <form class="search" id="search-form" role="search">
-      <label class="sr-only" for="search-input">Buscar contenido</label>
-      <input id="search-input" type="search" placeholder="Buscar títulos..." autocomplete="off">
-      <button class="button button--subtle" type="submit">Buscar</button>
-    </form>
-  </header>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-left">
+        <button class="hamburger" id="hamburger-btn" aria-label="Menú">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <a href="index.html" class="navbar-logo">KAREN<span>-FLIX</span></a>
+      </div>
+      <ul class="navbar-menu">
+        <li><a href="index.html" class="active">Inicio</a></li>
+        <li><a href="pages/catalogo.html">Populares</a></li>
+        <li><a href="pages/catalogo.html">Catálogo</a></li>
+      </ul>
+      <div class="navbar-right">
+        <div class="search-box">
+          <input type="text" id="search-input" placeholder="Buscar títulos...">
+          <button class="btn btn-primary" id="search-btn">Buscar</button>
+        </div>
+        <button class="btn btn-secondary" id="login-btn">Iniciar Sesión</button>
+        <button class="btn btn-primary" id="register-btn">Registrarse</button>
+      </div>
+    </div>
+  </nav>
 
-  <main id="inicio">
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero__content">
-        <p class="eyebrow">RECOMENDACIÓN DE LA SEMANA</p>
-        <h1 id="hero-title">Más historias.<br>Otros universos.</h1>
-        <p class="hero__description">Explora historias, documentales y aventuras seleccionadas para ti.</p>
-        <div class="hero__actions">
-          <a class="button button--primary" href="#catalogo">Explorar catálogo</a>
-          <a class="button button--outline" href="#populares">Ver populares</a>
+  <div class="mobile-menu" id="mobile-menu">
+    <button class="mobile-menu-close" id="mobile-menu-close">&times;</button>
+    <ul>
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="pages/catalogo.html">Populares</a></li>
+      <li><a href="pages/catalogo.html">Catálogo</a></li>
+      <li><a href="pages/login.html">Iniciar Sesión</a></li>
+      <li><a href="pages/login.html">Registrarse</a></li>
+    </ul>
+  </div>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1>Más historias. Otros universos.</h1>
+          <p>Explora historias, documentales y aventuras seleccionadas para ti.</p>
+          <div class="hero-buttons">
+            <a href="pages/catalogo.html" class="btn btn-primary">Explorar catálogo</a>
+            <a href="pages/catalogo.html?orden=popular" class="btn btn-secondary">Ver populares</a>
+          </div>
         </div>
       </div>
-      <div class="hero__art" aria-hidden="true">
-        <div class="orb orb--one"></div><div class="orb orb--two"></div>
-        <div class="hero__poster"><span>KAREN-FLIX</span><strong>ODISEA<br>ESTELAR</strong><small>UNA HISTORIA ORIGINAL</small></div>
+    </section>
+
+    <section class="container">
+      <div class="section-header">
+        <h2>Populares ahora</h2>
+        <span class="subtitle">Selección de prueba</span>
+      </div>
+      <div class="cards-grid" id="popular-cards">
+        <!-- Las tarjetas se cargan dinámicamente -->
       </div>
     </section>
 
-    <section class="section" id="populares" aria-labelledby="popular-title">
-      <div class="section__heading">
-        <div><p class="eyebrow">LO MÁS VISTO</p><h2 id="popular-title">Populares ahora</h2></div>
-        <span class="section__hint">Selección de prueba</span>
+    <section class="container">
+      <div class="section-header">
+        <h2>Recomendación de la semana</h2>
       </div>
-      <div class="card-grid" id="popular-list" aria-live="polite"></div>
-    </section>
-
-    <section class="section" id="catalogo" aria-labelledby="catalog-title">
-      <div class="catalog-controls">
-        <label class="filter-label" for="genre-filter">Género
-          <select id="genre-filter">
-            <option value="todos">Todos</option>
-            <option value="Ciencia ficción">Ciencia ficción</option>
-            <option value="Documental">Documental</option>
-            <option value="Drama">Drama</option>
-            <option value="Aventura">Aventura</option>
-            <option value="Animación">Animación</option>
-          </select>
-        </label>
-        <label class="filter-label" for="type-filter">Tipo
-          <select id="type-filter">
-            <option value="todos">Todos</option>
-            <option value="Serie">Serie</option>
-            <option value="Película">Película</option>
-            <option value="Documental">Documental</option>
-          </select>
-        </label>
-        <label class="filter-label" for="sort-filter">Ordenar por
-          <select id="sort-filter">
-            <option value="relevance">Relevancia</option>
-            <option value="rating-desc">Mejor calificación</option>
-            <option value="year-desc">Más recientes</option>
-            <option value="title-asc">Título A–Z</option>
-          </select>
-        </label>
+      <div class="cards-grid" id="recommended-cards">
+        <!-- Las tarjetas se cargan dinámicamente -->
       </div>
-      <div class="card-grid" id="catalog-list" aria-live="polite"></div>
-      <p class="empty-state" id="empty-state" hidden>No se encontraron títulos con esos criterios.</p>
-      <div class="pagination" id="pagination" aria-label="Paginación del catálogo">
-        <button class="button button--subtle" id="prev-page" type="button">Anterior</button>
-        <span id="page-status" aria-live="polite">Página 1 de 1</span>
-        <button class="button button--subtle" id="next-page" type="button">Siguiente</button>
-      </div>
-    </section>
-    <section class="section reviews-section" id="resenas" aria-labelledby="reviews-title">
-      <div class="section__heading">
-        <div><p class="eyebrow">COMUNIDAD</p><h2 id="reviews-title">Reseñas de prueba</h2></div>
-        <span class="section__hint">Puedes crear, editar reseñas tus peliculas favoritas</span>
-      </div>
-      <form class="review-form" id="review-form">
-        <input type="hidden" id="review-id">
-        <label for="review-title">Título de contenido
-          <select id="review-title" required></select>
-        </label>
-        <label for="review-rating">Calificación
-          <select id="review-rating" required>
-            <option value="5">5 — Excelente</option>
-            <option value="4">4 — Muy bueno</option>
-            <option value="3">3 — Bueno</option>
-            <option value="2">2 — Regular</option>
-            <option value="1">1 — Malo</option>
-          </select>
-        </label>
-        <label class="review-form__text" for="review-text">Reseña
-          <textarea id="review-text" rows="3" maxlength="500" placeholder="Comparte tu opinión (máximo 500 caracteres)" required></textarea>
-        </label>
-        <div class="review-form__actions">
-          <button class="button button--primary" id="review-submit" type="submit">Publicar reseña</button>
-          <button class="button button--subtle" id="review-cancel" type="button" hidden>Cancelar edición</button>
-        </div>
-      </form>
-      <div id="review-list" class="review-list" aria-live="polite"></div>
     </section>
   </main>
 
   <footer class="footer">
-    <a class="brand brand--small" href="#inicio">KAREN-FLIX<span>+</span></a>
-    
+    <div class="footer-content">
+      <p>Descubre las nuevas películas y series que están marcando tendencia</p>
+      <p>&copy; 2026 KAREN-FLIX. Todos los derechos reservados.</p>
+    </div>
   </footer>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script type="module" src="js/config.js"></script>
+  <script type="module" src="js/ui.js"></script>
+  <script type="module" src="js/api.js"></script>
+  <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/components/navbar.js"></script>
+  <script type="module" src="js/components/tarjetaPelicula.js"></script>
+  <script type="module" src="js/pages/inicio.js"></script>
 </body>
 </html>
