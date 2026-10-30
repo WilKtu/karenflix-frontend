@@ -1,29 +1,28 @@
-import { APP_CONFIG } from "./config.js";
+import { CONFIG } from './config.js';
+import { getToken } from './auth.js';
+import { demo } from './demo.js';
 
+const pedir = async (metodo, ruta, cuerpo) => {
+    if (CONFIG.USAR_DEMO) return demo(metodo, ruta, cuerpo);
 
-export async function apiRequest(path, options = {}) {
-  if (APP_CONFIG.USE_MOCK_DATA) {
-    throw new Error("El modo de prueba está activo. Conecta el backend y cambia USE_MOCK_DATA a false.");
-  }
+    const cabeceras = { 'Content-Type': 'application/json' };
+    const token = getToken();
+    if (token) cabeceras.Authorization = `Bearer ${token}`;
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), APP_CONFIG.REQUEST_TIMEOUT_MS);
-
-  try {
-    const response = await fetch(`${APP_CONFIG.API_BASE_URL}${path}`, {
-      ...options,
-      signal: controller.signal,
-      headers: {
-        "Content-Type": "application/json",
-        ...(options.headers || {})
-      }
+    const respuesta = await fetch(CONFIG.API_URL + ruta, {
+        method: metodo,
+        headers: cabeceras,
+        body: cuerpo ? JSON.stringify(cuerpo) : undefined
     });
+    const json = await respuesta.json().catch(() => ({}));
+    if (!respuesta.ok) throw new Error(json.mensaje || json.message || 'Error del servidor');
+    return json;
+};
 
-    if (!response.ok) {
-      throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
-    }
-    return await response.json();
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
+export const api = {
+    get: (ruta) => pedir('GET', ruta),
+    post: (ruta, cuerpo) => pedir('POST', ruta, cuerpo),
+    put: (ruta, cuerpo) => pedir('PUT', ruta, cuerpo),
+    patch: (ruta, cuerpo) => pedir('PATCH', ruta, cuerpo),
+    delete: (ruta) => pedir('DELETE', ruta)
+};
