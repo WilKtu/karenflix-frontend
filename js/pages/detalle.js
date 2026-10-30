@@ -1,5 +1,5 @@
 import { api } from '../api.js';
-import { getToken, getUsuario, esAdmin } from '../auth.js';
+import { getToken, getUsuario, esFavorito } from '../auth.js';
 import { toast, loader, escapar, estadoVacio, confirmar } from '../ui.js';
 import { montarNavbar } from '../components/navbar.js';
 import { montarSelectorNota } from '../components/selectorNota.js';
@@ -53,8 +53,8 @@ const htmlResena = (r) => {
         <div class="resena-pie">
             <p class="muted">Por <strong>${escapar(r.autor)}</strong> · ${escapar(r.created_at)}</p>
             <div class="acciones-resena">
-                <button class="btn btn-sm reaccion" data-id="${r.id}" data-tipo="like" aria-pressed="${r.miReaccion === 'like'}">Útil (${r.likes})</button>
-                <button class="btn btn-sm reaccion" data-id="${r.id}" data-tipo="dislike" aria-pressed="${r.miReaccion === 'dislike'}">No útil (${r.dislikes})</button>
+                <button class="btn btn-sm reaccion" data-id="${r.id}" data-tipo="like" aria-pressed="${r.miReaccion === 'like'}" title="Me gusta">👍 ${r.likes}</button>
+                <button class="btn btn-sm reaccion" data-id="${r.id}" data-tipo="dislike" aria-pressed="${r.miReaccion === 'dislike'}" title="No me gusta">👎 ${r.dislikes}</button>
                 ${controlesCrud}
             </div>
         </div>
@@ -77,9 +77,7 @@ const configurarEstadoFormularioResena = () => {
     } else {
         bloqueLogin.hidden = true;
         formResena.hidden = false;
-        document.getElementById('autor-form-resena').textContent = `Sesión: ${usuario.nombre} (${
-            esAdmin() ? 'Admin' : 'Miembro'
-        })`;
+        document.getElementById('autor-form-resena').textContent = `Publicando como ${usuario.nombre}`;
     }
 };
 
@@ -94,18 +92,29 @@ const pintar = () => {
         ? pelicula.actores.map((a) => (typeof a === 'object' ? a.nombre : a))
         : [];
 
+    const favActivo = esFavorito(pelicula.id);
+
     const embedUrl = extraerYoutubeEmbed(pelicula.trailer_url);
     const bloqueTrailer = embedUrl
         ? `<div class="trailer-seccion" id="contenedor-trailer">
                <div class="trailer-cabecera">
                    <h3>Tráiler oficial</h3>
-                   <button class="btn btn-sm" id="btn-modo-cine" type="button">Modo sala de cine (apagar luces)</button>
+                   <div class="acciones-resena">
+                       <button class="btn btn-sm ${favActivo ? 'fav-activo' : ''}" type="button" data-fav-id="${pelicula.id}" data-fav-texto="completo" aria-pressed="${favActivo}">
+                           ${favActivo ? '♥ En mis favoritos' : '♡ Agregar a favoritos'}
+                       </button>
+                       <button class="btn btn-sm" id="btn-modo-cine" type="button">Modo sala de cine (apagar luces)</button>
+                   </div>
                </div>
                <div class="trailer-marco">
                    <iframe src="${embedUrl}" title="Tráiler de ${escapar(pelicula.titulo)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                </div>
            </div>`
-        : '';
+        : `<div class="acciones">
+               <button class="btn btn-sm ${favActivo ? 'fav-activo' : ''}" type="button" data-fav-id="${pelicula.id}" data-fav-texto="completo" aria-pressed="${favActivo}">
+                   ${favActivo ? '♥ En mis favoritos' : '♡ Agregar a favoritos'}
+               </button>
+           </div>`;
 
     document.getElementById('info').innerHTML = `
         <div class="detalle-grid">
@@ -160,6 +169,12 @@ const pintar = () => {
     document.getElementById('resenas').innerHTML =
         pelicula.resenas.map(htmlResena).join('') ||
         estadoVacio('Aún no hay reseñas para esta producción. Sé la primera persona en compartir tu crítica.');
+
+    if (location.hash === '#contenedor-trailer') {
+        setTimeout(() => {
+            document.getElementById('contenedor-trailer')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
+    }
 };
 
 const cargar = async () => {

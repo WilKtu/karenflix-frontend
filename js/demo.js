@@ -541,8 +541,8 @@ export const demo = async (metodo, ruta, cuerpo) => {
             nombre,
             email,
             password,
-            rol: email.startsWith('admin') ? 'admin' : 'usuario',
-            bio: 'Nuevo miembro de la comunidad KAREN-FLIX.',
+            rol: 'usuario',
+            bio: 'Miembro de la comunidad KAREN-FLIX.',
             genero_favorito: 'Ciencia ficción'
         };
         db.usuarios.push(nuevoUsuario);

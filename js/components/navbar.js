@@ -1,10 +1,12 @@
 import {
     getUsuario,
+    getToken,
     cerrarSesion,
     esAdmin,
     actualizarUsuarioSesion,
     getNotificaciones,
-    marcarNotificacionesLeidas
+    marcarNotificacionesLeidas,
+    toggleFavorito
 } from '../auth.js';
 import { api } from '../api.js';
 import { raiz, aplicarTema, alternarTema, escapar, toast } from '../ui.js';
@@ -13,7 +15,8 @@ const enlaces = (activa) =>
     [
         ['inicio', 'Inicio', `${raiz}index.html`],
         ['populares', 'Populares', `${raiz}index.html#populares`],
-        ['catalogo', 'Catálogo', `${raiz}pages/catalogo.html`]
+        ['catalogo', 'Catálogo', `${raiz}pages/catalogo.html`],
+        ['favoritos', 'Favoritos', `${raiz}pages/catalogo.html?favoritos=1`]
     ]
         .map(
             ([id, texto, href]) =>
@@ -56,16 +59,13 @@ const botonesSesion = () => {
 
     const notifs = getNotificaciones();
     const sinLeer = notifs.filter((n) => !n.leida).length;
-    const rolBadge = esAdmin()
-        ? `<span class="rol-badge rol-admin" title="Cuenta de Administrador">Admin</span>`
-        : `<span class="rol-badge rol-user" title="Cuenta de Miembro">Miembro</span>`;
 
-    const btnAccionRol = esAdmin()
-        ? `<a class="btn btn-sm btn-admin-nav" href="${raiz}pages/admin.html">Panel Admin</a>`
+    const btnAccion = esAdmin()
+        ? `<a class="btn btn-sm btn-admin-nav" href="${raiz}pages/admin.html">Administración</a>`
         : `<button class="btn btn-sm btn-proponer-nav" id="btn-proponer-global" type="button" title="Sugerir una película o serie">+ Proponer título</button>`;
 
     return `
-        ${btnAccionRol}
+        ${btnAccion}
         <div class="notif-contenedor">
             <button class="btn btn-icono notif-btn" id="btn-notificaciones" type="button" aria-label="Notificaciones" title="Notificaciones">
                 ${iconoCampanaSvg}
@@ -84,7 +84,6 @@ const botonesSesion = () => {
         <button class="btn btn-perfil" id="btn-abrir-perfil" type="button" title="Editar mi perfil">
             <span class="avatar-mini">${escapar(usuario.nombre.charAt(0).toUpperCase())}</span>
             <span class="perfil-nombre">${escapar(usuario.nombre.split(' ')[0])}</span>
-            ${rolBadge}
         </button>
         <button class="btn btn-sm btn-salir-icono" id="btn-salir" type="button" title="Cerrar sesión">Salir</button>
     `;
@@ -101,12 +100,9 @@ const inyectarModalesGlobales = () => {
             <form id="form-perfil-global" novalidate>
                 <div class="modal-cabecera-cine">
                     <div>
-                        <p class="eyebrow">Configuración de cuenta</p>
-                        <h2 id="titulo-dlg-perfil">Editar mi perfil</h2>
+                        <p class="eyebrow">Mi cuenta</p>
+                        <h2 id="titulo-dlg-perfil">Editar perfil</h2>
                     </div>
-                    <span class="rol-badge ${esAdmin() ? 'rol-admin' : 'rol-user'}">
-                        ${esAdmin() ? 'Administrador' : 'Miembro'}
-                    </span>
                 </div>
 
                 <div class="campo">
@@ -150,21 +146,17 @@ const inyectarModalesGlobales = () => {
             </form>
         </dialog>
 
-        <!-- Modal Global para Proponer Película (Usuario o Admin) -->
+        <!-- Modal Global para Proponer Película (Usuario Estándar) -->
         <dialog id="dlg-proponer-global" class="modal-cine" aria-labelledby="titulo-dlg-proponer">
             <form id="form-proponer-global" novalidate>
                 <div class="modal-cabecera-cine">
                     <div>
                         <p class="eyebrow">Catálogo colaborativo</p>
-                        <h2 id="titulo-dlg-proponer">${esAdmin() ? 'Publicar nueva película' : 'Proponer película o serie'}</h2>
+                        <h2 id="titulo-dlg-proponer">Proponer película o serie</h2>
                     </div>
                 </div>
                 <p class="muted" style="margin-bottom:1rem;font-size:0.85rem;">
-                    ${
-                        esAdmin()
-                            ? 'Como administrador, el título quedará aprobado y visible en cartelera inmediatamente.'
-                            : 'Tu propuesta será enviada con estado "Pendiente" para revisión del administrador.'
-                    }
+                    Tu propuesta será enviada con estado "Pendiente" para revisión del administrador.
                 </p>
 
                 <div class="campo">
@@ -235,7 +227,7 @@ const inyectarModalesGlobales = () => {
 
                 <p class="error-campo" id="error-proponer-global" role="alert"></p>
                 <div class="acciones">
-                    <button class="btn btn-primario" type="submit">${esAdmin() ? 'Publicar en cartelera' : 'Enviar propuesta'}</button>
+                    <button class="btn btn-primario" type="submit">Enviar propuesta</button>
                     <button class="btn" type="button" id="btn-cerrar-proponer">Cancelar</button>
                 </div>
             </form>
@@ -341,17 +333,41 @@ const inyectarModalesGlobales = () => {
             form.reset();
             imgPrev.hidden = true;
             phPrev.hidden = false;
-            toast(
-                esAdmin()
-                    ? 'Película publicada directamente en cartelera'
-                    : 'Propuesta enviada para revisión del administrador'
-            );
+            toast('Propuesta enviada para revisión del administrador');
             setTimeout(() => location.reload(), 900);
         } catch (err) {
             errEl.textContent = err.message;
         }
     });
 };
+
+// Delegación global para botones de Favoritos (♥ / ♡)
+if (!window.__karenflixFavListener) {
+    window.__karenflixFavListener = true;
+    document.addEventListener('click', (e) => {
+        const btnFav = e.target.closest('[data-fav-id]');
+        if (!btnFav) return;
+        e.preventDefault();
+        if (!getToken()) {
+            toast('Inicia sesión para guardar películas en tus Favoritos', 'error');
+            setTimeout(() => (location.href = `${raiz}pages/login.html`), 700);
+            return;
+        }
+        const idPeli = Number(btnFav.dataset.favId);
+        const agregado = toggleFavorito(idPeli);
+        document.querySelectorAll(`[data-fav-id="${idPeli}"]`).forEach((b) => {
+            b.classList.toggle('fav-activo', agregado);
+            b.setAttribute('aria-pressed', String(agregado));
+            if (b.dataset.favTexto === 'completo') {
+                b.textContent = agregado ? '♥ En mis favoritos' : '♡ Agregar a favoritos';
+            } else {
+                b.textContent = agregado ? '♥' : '♡';
+            }
+        });
+        toast(agregado ? 'Agregada a tus Favoritos' : 'Quitada de tus Favoritos');
+        window.dispatchEvent(new CustomEvent('favoritos-actualizados'));
+    });
+}
 
 export const montarNavbar = (activa) => {
     aplicarTema();

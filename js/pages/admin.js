@@ -312,7 +312,7 @@ const iniciar = () => {
                     <h2 style="margin:0.2rem 0;">Hola, ${escapar(adminUser.nombre)}</h2>
                     <p class="muted">Gestiona categorías, películas en cartelera y propuestas enviadas por la comunidad.</p>
                 </div>
-                <span class="rol-badge rol-admin" style="font-size:0.78rem;padding:0.35rem 0.75rem;">Rol: Administrador</span>
+                <span class="rol-badge rol-admin" style="font-size:0.76rem;padding:0.32rem 0.7rem;">Administrador</span>
             </div>
         `;
     }

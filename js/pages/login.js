@@ -126,8 +126,7 @@ const enviar = (modo) => async (e) => {
         const { datos: sesion } = await api.post(`/auth/${modo === 'registro' ? 'register' : 'login'}`, cuerpo);
         guardarSesion(sesion.token, sesion.usuario);
 
-        const rolTexto = sesion.usuario.rol === 'admin' ? 'Administrador' : 'Miembro';
-        toast(`Sesión iniciada: ${sesion.usuario.nombre} (${rolTexto})`);
+        toast(`Bienvenida(o), ${sesion.usuario.nombre}`);
 
         const redirectParam = new URLSearchParams(location.search).get('redirect');
         setTimeout(() => {
@@ -138,7 +137,7 @@ const enviar = (modo) => async (e) => {
             } else {
                 location.href = `${raiz}index.html`;
             }
-        }, 650);
+        }, 600);
     } catch (error) {
         mostrarError(modo, error.message);
         toast(error.message, 'error');
@@ -146,25 +145,6 @@ const enviar = (modo) => async (e) => {
         boton.textContent = modo === 'registro' ? 'Crear cuenta' : 'Iniciar sesión';
     }
 };
-
-// Botones de autocompletado para demostración de roles
-document.getElementById('btn-fill-admin')?.addEventListener('click', () => {
-    mostrar('login');
-    document.getElementById('l-email').value = 'admin@karenflix.com';
-    document.getElementById('l-pass').value = 'Admin1234!';
-    hintLoginEmail.textContent = '✓ Cuenta de Administrador lista';
-    hintLoginEmail.style.color = 'var(--ok)';
-    toast('Credenciales de Administrador cargadas');
-});
-
-document.getElementById('btn-fill-user')?.addEventListener('click', () => {
-    mostrar('login');
-    document.getElementById('l-email').value = 'wilder@karenflix.com';
-    document.getElementById('l-pass').value = 'Wilder1234!';
-    hintLoginEmail.textContent = '✓ Cuenta de Usuario lista';
-    hintLoginEmail.style.color = 'var(--ok)';
-    toast('Credenciales de Usuario cargadas');
-});
 
 formularios.login.addEventListener('submit', enviar('login'));
 formularios.registro.addEventListener('submit', enviar('registro'));

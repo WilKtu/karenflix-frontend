@@ -393,7 +393,10 @@ input, select, textarea { width: 100%; font: inherit; color: var(--text); backgr
     transition: transform 0.3s ease;
 }
 .hero-poster:hover { transform: translateY(-3px); }
+.hero-poster:hover .hero-poster-overlay { opacity: 1; }
 .hero-poster-caption {
+    position: relative;
+    z-index: 2;
     background: rgb(7 13 25 / 0.78);
     backdrop-filter: blur(4px);
     padding: 0.3rem 0.7rem;
@@ -472,7 +475,14 @@ input, select, textarea { width: 100%; font: inherit; color: var(--text); backgr
     margin-bottom: 0.5rem;
 }
 .tarjeta-pie { margin-top: auto; }
-.btn-cine-card { width: 100%; }
+.tarjeta-pie-acciones { display: flex; gap: 0.45rem; align-items: center; }
+.btn-cine-card { flex: 1; }
+.btn-fav { min-width: 2.3rem; font-size: 1rem; line-height: 1; padding-inline: 0.55rem; }
+.fav-activo {
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+    background: color-mix(in srgb, var(--accent) 16%, var(--surface-2)) !important;
+}
 .score { color: var(--accent-ice); font-weight: 700; }
 .top-card-wrap { position: relative; padding-top: 0.4rem; }
 .top-numero { font-size: 2rem; color: var(--accent); font-weight: 900; line-height: 1; display: block; margin-bottom: 0.25rem; }
