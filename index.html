@@ -1,100 +1,36 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KAREN-FLIX - Descubre películas y series</title>
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/components.css">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>KAREN-FLIX</title>
+    <link rel="stylesheet" href="css/variables.css"><link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/components.css">
 </head>
 <body>
-  <nav class="navbar">
-    <div class="navbar-container">
-      <div class="navbar-left">
-        <button class="hamburger" id="hamburger-btn" aria-label="Menú">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-        <a href="index.html" class="navbar-logo">KAREN<span>-FLIX</span></a>
-      </div>
-      <ul class="navbar-menu">
-        <li><a href="index.html" class="active">Inicio</a></li>
-        <li><a href="pages/catalogo.html">Populares</a></li>
-        <li><a href="pages/catalogo.html">Catálogo</a></li>
-      </ul>
-      <div class="navbar-right">
-        <div class="search-box">
-          <input type="text" id="search-input" placeholder="Buscar títulos...">
-          <button class="btn btn-primary" id="search-btn">Buscar</button>
-        </div>
-        <button class="btn btn-secondary" id="login-btn">Iniciar Sesión</button>
-        <button class="btn btn-primary" id="register-btn">Registrarse</button>
-      </div>
-    </div>
-  </nav>
-
-  <div class="mobile-menu" id="mobile-menu">
-    <button class="mobile-menu-close" id="mobile-menu-close">&times;</button>
-    <ul>
-      <li><a href="index.html">Inicio</a></li>
-      <li><a href="pages/catalogo.html">Populares</a></li>
-      <li><a href="pages/catalogo.html">Catálogo</a></li>
-      <li><a href="pages/login.html">Iniciar Sesión</a></li>
-      <li><a href="pages/login.html">Registrarse</a></li>
-    </ul>
-  </div>
-
-  <main>
-    <section class="hero">
-      <div class="container">
-        <div class="hero-content">
-          <h1>Más historias. Otros universos.</h1>
-          <p>Explora historias, documentales y aventuras seleccionadas para ti.</p>
-          <div class="hero-buttons">
-            <a href="pages/catalogo.html" class="btn btn-primary">Explorar catálogo</a>
-            <a href="pages/catalogo.html?orden=popular" class="btn btn-secondary">Ver populares</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="container">
-      <div class="section-header">
-        <h2>Populares ahora</h2>
-        <span class="subtitle">Selección de prueba</span>
-      </div>
-      <div class="cards-grid" id="popular-cards">
-        <!-- Las tarjetas se cargan dinámicamente -->
-      </div>
-    </section>
-
-    <section class="container">
-      <div class="section-header">
-        <h2>Recomendación de la semana</h2>
-      </div>
-      <div class="cards-grid" id="recommended-cards">
-        <!-- Las tarjetas se cargan dinámicamente -->
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-content">
-      <p>Descubre las nuevas películas y series que están marcando tendencia</p>
-      <p>&copy; 2026 KAREN-FLIX. Todos los derechos reservados.</p>
-    </div>
-  </footer>
-
-  <div class="toast-container" id="toast-container"></div>
-
-  <script type="module" src="js/config.js"></script>
-  <script type="module" src="js/ui.js"></script>
-  <script type="module" src="js/api.js"></script>
-  <script type="module" src="js/auth.js"></script>
-  <script type="module" src="js/components/navbar.js"></script>
-  <script type="module" src="js/components/tarjetaPelicula.js"></script>
-  <script type="module" src="js/pages/inicio.js"></script>
+    <div id="navbar"></div>
+    <main>
+        <section class="hero"><div class="contenedor hero-grid">
+            <div id="hero-contenido"><p class="muted">Cargando...</p></div>
+            <div class="poster hero-poster" id="hero-poster" style="--h:200" role="img" aria-label="Póster destacado"></div>
+        </div></section>
+        <section class="seccion contenedor" id="populares">
+            <p class="eyebrow">Lo más visto</p><h2 class="titulo-seccion">Populares ahora</h2>
+            <div class="grid-tarjetas" id="populares-lista"></div>
+        </section>
+        <section class="seccion contenedor">
+            <h2 class="titulo-seccion">Top 10</h2>
+            <div class="acciones"><button class="btn" data-scroll="-1" aria-label="Anterior">←</button><button class="btn" data-scroll="1" aria-label="Siguiente">→</button></div>
+            <div class="carrusel" id="top10"></div>
+        </section>
+        <div class="contenedor" id="categorias"></div>
+        <section class="seccion contenedor"><div class="caja">
+            <h2 class="titulo-seccion">Únete a KAREN-FLIX</h2>
+            <p class="muted">Califica, reseña y vota tus producciones favoritas.</p>
+            <div class="acciones"><a class="btn btn-primario" href="pages/login.html?modo=registro">Registrarse</a><a class="btn" href="pages/login.html">Iniciar sesión</a></div>
+        </div></section>
+    </main>
+    <footer class="footer"><div class="contenedor footer-grid">
+        <div><a class="logo" href="index.html">KAREN<span>-FLIX</span></a><p>Descubre nuevas historias, películas y universos por explorar</p></div>
+        <nav aria-label="Pie"><a href="index.html">Inicio</a> · <a href="pages/catalogo.html">Catálogo</a></nav>
+    </div></footer>
+    <script type="module" src="js/pages/inicio.js"></script>
 </body>
 </html>

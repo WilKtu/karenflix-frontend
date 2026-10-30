@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Catálogo · KAREN-FLIX</title>
+    <link rel="stylesheet" href="../css/variables.css"><link rel="stylesheet" href="../css/base.css"><link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+    <div id="navbar"></div>
+    <main class="contenedor seccion">
+        <p class="eyebrow">Explora</p><h1 class="titulo-seccion">Catálogo</h1>
+        <div class="filtros">
+            <input type="search" id="q" placeholder="Buscar títulos..." aria-label="Buscar">
+            <select id="tipo" aria-label="Tipo"><option value="">Todo tipo</option><option value="pelicula">Película</option><option value="serie">Serie</option><option value="anime">Anime</option><option value="documental">Documental</option></select>
+            <input type="number" id="anio" placeholder="Año" min="1900" max="2100" aria-label="Año">
+            <select id="orden" aria-label="Ordenar"><option value="ranking">Ranking</option><option value="popularidad">Popularidad</option><option value="recientes">Recientes</option></select>
+        </div>
+        <div class="chips" id="chips"></div>
+        <div class="grid-tarjetas" id="lista"></div>
+        <div class="acciones"><button class="btn" id="mas" type="button" hidden>Cargar más</button></div>
+    </main>
+    <footer class="footer"><div class="contenedor footer-grid">
+        <div><a class="logo" href="../index.html">KAREN<span>-FLIX</span></a><p>Descubre nuevas historias, películas y universos por explorar</p></div>
+        <nav aria-label="Pie"><a href="../index.html">Inicio</a> · <a href="../pages/catalogo.html">Catálogo</a></nav>
+    </div></footer>
+    <script type="module" src="../js/pages/catalogo.js"></script>
+</body>
+</html>
