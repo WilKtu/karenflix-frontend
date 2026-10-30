@@ -1,5 +1,5 @@
 import { api } from '../api.js';
-import { guardarSesion } from '../auth.js';
+import { guardarSesion, restablecerAvisoCookies } from '../auth.js';
 import { toast, raiz } from '../ui.js';
 import { montarNavbar } from '../components/navbar.js';
 
@@ -148,3 +148,9 @@ const enviar = (modo) => async (e) => {
 
 formularios.login.addEventListener('submit', enviar('login'));
 formularios.registro.addEventListener('submit', enviar('registro'));
+
+document.getElementById('btn-ver-aviso-cookies')?.addEventListener('click', () => {
+    restablecerAvisoCookies();
+    montarNavbar('');
+    toast('Aviso de cookies y sesión JWT visible en la parte inferior');
+});

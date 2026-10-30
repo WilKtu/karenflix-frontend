@@ -217,6 +217,7 @@ document.getElementById('resenas').addEventListener('click', async (e) => {
             await api.post(`/resenas/${botonReaccion.dataset.id}/reaccion`, {
                 tipo: botonReaccion.dataset.tipo
             });
+            toast('Reacción registrada · Ranking actualizado');
             await cargar();
         } catch (error) {
             toast(error.message, 'error');

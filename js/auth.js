@@ -1,10 +1,62 @@
-// Gestión de sesión, permisos, favoritos y notificaciones de usuario en el cliente.
+// Gestión de sesión con Cookies + JSON Web Token (JWT), permisos, favoritos y notificaciones.
 const CLAVE = 'karenflix_sesion';
 const CLAVE_NOTIF = 'karenflix_notificaciones';
 const CLAVE_FAV = 'karenflix_favoritos_v1';
+const COOKIE_TOKEN = 'karenflix_token';
+const COOKIE_CONSENT = 'karenflix_cookies_accepted';
 
-export const guardarSesion = (token, usuario) =>
+const base64UrlDecode = (str) => {
+    try {
+        const base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+        const padded = base64 + '==='.slice((base64.length + 3) % 4);
+        return decodeURIComponent(
+            atob(padded)
+                .split('')
+                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+    } catch {
+        return null;
+    }
+};
+
+export const decodificarJwt = (token) => {
+    if (!token || typeof token !== 'string') return null;
+    const partes = token.split('.');
+    if (partes.length !== 3) return null;
+    const jsonPayload = base64UrlDecode(partes[1]);
+    if (!jsonPayload) return null;
+    try {
+        return JSON.parse(jsonPayload);
+    } catch {
+        return null;
+    }
+};
+
+export const leerCookie = (nombre) => {
+    const match = document.cookie.match(new RegExp('(?:^|; )' + nombre + '=([^;]*)'));
+    return match ? decodeURIComponent(match[1]) : null;
+};
+
+export const cookiesAceptadas = () =>
+    leerCookie(COOKIE_CONSENT) === 'true' || localStorage.getItem(COOKIE_CONSENT) === 'true';
+
+export const aceptarCookies = () => {
+    document.cookie = `${COOKIE_CONSENT}=true; path=/; max-age=2592000; SameSite=Lax`;
+    localStorage.setItem(COOKIE_CONSENT, 'true');
+};
+
+export const restablecerAvisoCookies = () => {
+    document.cookie = `${COOKIE_CONSENT}=; path=/; max-age=0; SameSite=Lax`;
+    localStorage.removeItem(COOKIE_CONSENT);
+};
+
+export const guardarSesion = (token, usuario) => {
+    // 1. Guardar Cookie de sesión con el JWT (expiración de 2 horas = 7200 segundos)
+    document.cookie = `${COOKIE_TOKEN}=${encodeURIComponent(token)}; path=/; max-age=7200; SameSite=Lax`;
+    // 2. Sincronizar estado de sesión en almacenamiento local
     localStorage.setItem(CLAVE, JSON.stringify({ token, usuario }));
+};
 
 export const actualizarUsuarioSesion = (parcial) => {
     const actual = leer();
@@ -14,11 +66,29 @@ export const actualizarUsuarioSesion = (parcial) => {
     return actualizado;
 };
 
-export const cerrarSesion = () => localStorage.removeItem(CLAVE);
+export const cerrarSesion = () => {
+    document.cookie = `${COOKIE_TOKEN}=; path=/; max-age=0; SameSite=Lax`;
+    localStorage.removeItem(CLAVE);
+};
 
 const leer = () => {
     try {
-        return JSON.parse(localStorage.getItem(CLAVE)) || {};
+        const datos = JSON.parse(localStorage.getItem(CLAVE)) || {};
+        const tokenCookie = leerCookie(COOKIE_TOKEN);
+        const token = tokenCookie || datos.token || null;
+        if (!token) return {};
+
+        const payload = decodificarJwt(token);
+        if (payload?.exp && payload.exp * 1000 < Date.now()) {
+            cerrarSesion();
+            return {};
+        }
+
+        // Asegurar que la cookie permanezca sincronizada si la sesión sigue activa
+        if (!tokenCookie && datos.token) {
+            document.cookie = `${COOKIE_TOKEN}=${encodeURIComponent(datos.token)}; path=/; max-age=7200; SameSite=Lax`;
+        }
+        return { token, usuario: datos.usuario || null, payload };
     } catch {
         return {};
     }
@@ -26,6 +96,7 @@ const leer = () => {
 
 export const getToken = () => leer().token || null;
 export const getUsuario = () => leer().usuario || null;
+export const getJwtPayload = () => leer().payload || decodificarJwt(getToken());
 export const esAdmin = () => getUsuario()?.rol === 'admin';
 
 export const requireAuth = () => {
@@ -49,7 +120,6 @@ export const getFavoritosIds = () => {
         if (!getUsuario()) return [];
         const guardados = JSON.parse(localStorage.getItem(claveFavUsuario()));
         if (Array.isArray(guardados)) return guardados.map(Number);
-        // Favoritos iniciales de muestra para cuentas registradas
         const iniciales = [1, 3];
         localStorage.setItem(claveFavUsuario(), JSON.stringify(iniciales));
         return iniciales;

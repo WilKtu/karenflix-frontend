@@ -1,12 +1,15 @@
 import {
     getUsuario,
     getToken,
+    getJwtPayload,
     cerrarSesion,
     esAdmin,
     actualizarUsuarioSesion,
     getNotificaciones,
     marcarNotificacionesLeidas,
-    toggleFavorito
+    toggleFavorito,
+    cookiesAceptadas,
+    aceptarCookies
 } from '../auth.js';
 import { api } from '../api.js';
 import { raiz, aplicarTema, alternarTema, escapar, toast } from '../ui.js';
@@ -89,9 +92,41 @@ const botonesSesion = () => {
     `;
 };
 
+const inyectarBannerCookies = () => {
+    if (cookiesAceptadas() || document.getElementById('banner-cookies')) return;
+    const banner = document.createElement('div');
+    banner.id = 'banner-cookies';
+    banner.className = 'banner-cookies';
+    banner.setAttribute('role', 'region');
+    banner.setAttribute('aria-label', 'Aviso de privacidad y cookies');
+    banner.innerHTML = `
+        <div class="contenedor banner-cookies-fila">
+            <p>
+                <strong>Cookies y sesión segura (JWT):</strong>
+                Utilizamos la cookie <code>karenflix_token</code> y tokens JWT firmados para autenticar tu cuenta de forma segura.
+            </p>
+            <div class="banner-cookies-acciones">
+                <button class="btn btn-sm btn-primario" id="btn-aceptar-cookies" type="button">Aceptar cookies</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(banner);
+    document.getElementById('btn-aceptar-cookies')?.addEventListener('click', () => {
+        aceptarCookies();
+        banner.remove();
+        toast('Preferencia de cookies guardada en el navegador');
+    });
+};
+
 const inyectarModalesGlobales = () => {
     const usuario = getUsuario();
     if (!usuario || document.getElementById('dlg-perfil-global')) return;
+
+    const tokenActual = getToken() || '';
+    const jwtPayload = getJwtPayload();
+    const expiraTexto = jwtPayload?.exp
+        ? new Date(jwtPayload.exp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : '2 horas';
 
     const contenedor = document.createElement('div');
     contenedor.innerHTML = `
@@ -136,6 +171,14 @@ const inyectarModalesGlobales = () => {
                 <div class="campo">
                     <label for="perf-bio">Biografía corta</label>
                     <textarea id="perf-bio" name="bio" rows="2" maxlength="180" placeholder="Cuéntanos qué tipo de películas te gustan...">${escapar(usuario.bio || '')}</textarea>
+                </div>
+
+                <div class="jwt-info-box">
+                    <span class="eyebrow" style="font-size:0.68rem;">Seguridad de sesión activa</span>
+                    <p class="muted" style="font-size:0.76rem;margin-top:0.2rem;">
+                        Cookie: <code>karenflix_token</code> (SameSite=Lax) · Expira: <strong>${escapar(expiraTexto)}</strong><br>
+                        JWT (HS256): <code>${escapar(tokenActual.slice(0, 36))}...</code>
+                    </p>
                 </div>
 
                 <p class="error-campo" id="error-perfil-global" role="alert"></p>
@@ -380,10 +423,29 @@ export const montarNavbar = (activa) => {
             <button class="btn btn-icono" id="btn-menu" type="button" aria-label="Abrir menú" aria-expanded="false">☰</button>
             <a class="logo" href="${raiz}index.html">KAREN<span>-FLIX</span></a>
             <nav class="nav-links" aria-label="Principal">${enlaces(activa)}</nav>
-            <form class="buscador" id="form-buscar" role="search">
-                <input type="search" id="buscar" placeholder="Buscar títulos..." aria-label="Buscar títulos">
-                <button class="btn" type="submit">Buscar</button>
-            </form>
+
+            <div class="buscador-grupo">
+                <div class="nav-cat-wrap">
+                    <button class="btn btn-sm btn-cat-nav" id="btn-nav-categorias" type="button" aria-expanded="false">
+                        Categorías ▾
+                    </button>
+                    <div class="nav-cat-dropdown" id="menu-nav-categorias" hidden>
+                        <a href="${raiz}pages/catalogo.html">Todas las categorías</a>
+                        <a href="${raiz}pages/catalogo.html?categoria=Ciencia%20ficci%C3%B3n">Ciencia ficción</a>
+                        <a href="${raiz}pages/catalogo.html?categoria=Acci%C3%B3n">Acción</a>
+                        <a href="${raiz}pages/catalogo.html?categoria=Drama">Drama</a>
+                        <a href="${raiz}pages/catalogo.html?categoria=Anime">Anime</a>
+                        <a href="${raiz}pages/catalogo.html?categoria=Documental">Documental</a>
+                        <a href="${raiz}pages/catalogo.html?categoria=Suspenso">Suspenso</a>
+                        <a href="${raiz}pages/catalogo.html?favoritos=1" class="nav-cat-fav">♥ Mis Favoritos</a>
+                    </div>
+                </div>
+                <form class="buscador" id="form-buscar" role="search">
+                    <input type="search" id="buscar" placeholder="Buscar título o director..." aria-label="Buscar títulos">
+                    <button class="btn btn-sm" type="submit">Buscar</button>
+                </form>
+            </div>
+
             <div class="nav-acciones">
                 <button class="btn btn-icono" id="btn-tema" type="button" title="Cambiar tema claro/oscuro" aria-label="Cambiar entre tema claro y oscuro">◐</button>
                 ${botonesSesion()}
@@ -393,6 +455,7 @@ export const montarNavbar = (activa) => {
         <div class="fondo-panel" id="fondo-panel"></div>`;
 
     inyectarModalesGlobales();
+    inyectarBannerCookies();
 
     const cuerpo = document.body;
     const boton = document.getElementById('btn-menu');
@@ -407,10 +470,37 @@ export const montarNavbar = (activa) => {
     document.addEventListener('keydown', (e) => e.key === 'Escape' && alternar(false));
     document.getElementById('btn-tema').addEventListener('click', alternarTema);
 
+    // Desplegable de Categorías junto al buscador
+    const btnCatNav = document.getElementById('btn-nav-categorias');
+    const menuCatNav = document.getElementById('menu-nav-categorias');
+    if (btnCatNav && menuCatNav) {
+        btnCatNav.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const abierto = !menuCatNav.hidden;
+            menuCatNav.hidden = abierto;
+            btnCatNav.setAttribute('aria-expanded', String(!abierto));
+        });
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.nav-cat-wrap')) {
+                menuCatNav.hidden = true;
+                btnCatNav.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    // Validación intuitiva del buscador
+    const inputBuscar = document.getElementById('buscar');
+    inputBuscar.addEventListener('input', () => inputBuscar.classList.remove('input-invalido'));
     document.getElementById('form-buscar').addEventListener('submit', (e) => {
         e.preventDefault();
-        const q = document.getElementById('buscar').value.trim();
-        location.href = `${raiz}pages/catalogo.html${q ? `?q=${encodeURIComponent(q)}` : ''}`;
+        const q = inputBuscar.value.trim();
+        if (!q) {
+            inputBuscar.classList.add('input-invalido');
+            inputBuscar.focus();
+            toast('Escribe un título primero para buscar, o selecciona una Categoría', 'error');
+            return;
+        }
+        location.href = `${raiz}pages/catalogo.html?q=${encodeURIComponent(q)}`;
     });
 
     // Evento de Notificaciones
@@ -463,8 +553,9 @@ export const montarNavbar = (activa) => {
 
     // Evento de Cerrar Sesión
     document.getElementById('btn-salir')?.addEventListener('click', () => {
+        api.post('/auth/logout', {}).catch(() => {});
         cerrarSesion();
-        toast('Sesión cerrada correctamente');
+        toast('Sesión cerrada y cookie eliminada');
         setTimeout(() => (location.href = `${raiz}index.html`), 500);
     });
 };

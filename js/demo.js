@@ -43,7 +43,7 @@ const estadoInicial = () => ({
     peliculas: [
         {
             id: 1,
-            titulo: 'Interstellar: Odisea Cósmica',
+            titulo: 'Interestelar: Odisea Cósmica',
             tipo: 'pelicula',
             anio: 2014,
             duracion_minutos: 169,
@@ -282,38 +282,77 @@ const normalizar = (t) =>
         .toLowerCase()
         .replace(/\s+/g, ' ');
 
+const calcularMetricasPelicula = (db, p) => {
+    const lista = db.resenas.filter((r) => r.pelicula_id === p.id);
+    const totalLikes = lista.reduce((acc, r) => acc + Number(r.likes || 0), 0);
+    const totalDislikes = lista.reduce((acc, r) => acc + Number(r.dislikes || 0), 0);
+    p.total_likes = totalLikes;
+    p.total_dislikes = totalDislikes;
+
+    if (lista.length > 0) {
+        p.total_resenas = lista.length;
+        const promedioBase = lista.reduce((acc, r) => acc + Number(r.calificacion), 0) / lista.length;
+        // Bono por likes netos en las reseñas para reflejar impacto en el Top 10
+        const bonoLikes = Math.min(0.8, Math.max(-0.8, (totalLikes - totalDislikes) * 0.08));
+        p.rating_promedio = Number(Math.min(10, Math.max(1, promedioBase + bonoLikes)).toFixed(1));
+    }
+    p.score_ranking = Number(
+        (
+            Number(p.rating_promedio || 0) * 10 +
+            totalLikes * 2.5 -
+            totalDislikes * 1.5 +
+            Number(p.total_resenas || 0) * 1.2
+        ).toFixed(2)
+    );
+};
+
 const recalcularPelicula = (db, peliculaId) => {
     const p = db.peliculas.find((x) => x.id === Number(peliculaId));
     if (!p) return;
-    const lista = db.resenas.filter((r) => r.pelicula_id === p.id);
-    p.total_resenas = lista.length;
-    p.rating_promedio = lista.length
-        ? Number((lista.reduce((acc, r) => acc + Number(r.calificacion), 0) / lista.length).toFixed(1))
-        : 0;
+    calcularMetricasPelicula(db, p);
 };
 
 const ordenes = {
-    ranking: (a, b) => b.rating_promedio - a.rating_promedio || b.total_resenas - a.total_resenas,
-    popularidad: (a, b) => b.total_resenas - a.total_resenas || b.rating_promedio - a.rating_promedio,
+    ranking: (a, b) =>
+        (b.score_ranking ?? b.rating_promedio * 10) - (a.score_ranking ?? a.rating_promedio * 10) ||
+        b.rating_promedio - a.rating_promedio ||
+        b.total_resenas - a.total_resenas,
+    popularidad: (a, b) =>
+        (b.total_likes || 0) + b.total_resenas * 2 - ((a.total_likes || 0) + a.total_resenas * 2) ||
+        b.rating_promedio - a.rating_promedio,
     recientes: (a, b) => b.anio - a.anio || b.id - a.id
 };
 
+const normalizarBusqueda = (t) =>
+    normalizar(t)
+        .replace(/interstellar/g, 'interestelar')
+        .replace(/ll/g, 'l')
+        .replace(/ss/g, 's')
+        .replace(/tt/g, 't');
+
 const listarPeliculas = (db, params) => {
-    const q = (params.get('q') || '').toLowerCase();
+    db.peliculas.forEach((p) => calcularMetricasPelicula(db, p));
+    const qRaw = params.get('q') || '';
+    const q = normalizarBusqueda(qRaw);
     const catParam = params.get('categoria') || params.get('categoria_id') || '';
     const filtradas = db.peliculas
         .filter(aprobada)
         .filter((p) => {
             if (!catParam) return true;
-            return p.categoria === catParam || String(p.categoria_id) === String(catParam);
+            return (
+                normalizar(p.categoria) === normalizar(catParam) ||
+                String(p.categoria_id) === String(catParam)
+            );
         })
         .filter((p) => !params.get('tipo') || p.tipo === params.get('tipo'))
         .filter((p) => !params.get('anio') || p.anio === Number(params.get('anio')))
-        .filter(
-            (p) =>
-                p.titulo.toLowerCase().includes(q) ||
-                (p.director && p.director.toLowerCase().includes(q))
-        )
+        .filter((p) => {
+            if (!q) return true;
+            const textoPelicula = normalizarBusqueda(
+                `${p.titulo} ${p.director || ''} ${p.categoria || ''} ${(p.actores || []).join(' ')}`
+            );
+            return textoPelicula.includes(q);
+        })
         .sort(ordenes[params.get('orden')] || ordenes.ranking);
 
     const limit = Number(params.get('limit')) || 8;
@@ -482,6 +521,32 @@ const rutasPeliculas = (db, metodo, partes, cuerpo) => {
     return undefined;
 };
 
+const base64UrlEncode = (obj) => {
+    const json = JSON.stringify(obj);
+    const bytes = encodeURIComponent(json).replace(/%([0-9A-F]{2})/g, (_, p1) =>
+        String.fromCharCode(parseInt(p1, 16))
+    );
+    return btoa(bytes).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+};
+
+const generarJwtFirmado = (usuario) => {
+    const ahora = Math.floor(Date.now() / 1000);
+    const header = base64UrlEncode({ alg: 'HS256', typ: 'JWT' });
+    const payload = base64UrlEncode({
+        id: usuario.id,
+        nombre: usuario.nombre,
+        email: usuario.email,
+        rol: usuario.rol,
+        iat: ahora,
+        exp: ahora + 7200
+    });
+    const firma = btoa(`karenflix-hs256-${usuario.id}-${usuario.rol}-${ahora}`)
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+    return `${header}.${payload}.${firma}`;
+};
+
 export const demo = async (metodo, ruta, cuerpo) => {
     await new Promise((ok) => setTimeout(ok, 220));
     const db = cargarDB();
@@ -509,7 +574,7 @@ export const demo = async (metodo, ruta, cuerpo) => {
         const { password: _, ...usuarioSeguro } = usuario;
         return {
             datos: {
-                token: `jwt-karenflix-${usuario.id}-${Date.now()}`,
+                token: generarJwtFirmado(usuarioSeguro),
                 usuario: usuarioSeguro
             }
         };
@@ -558,7 +623,7 @@ export const demo = async (metodo, ruta, cuerpo) => {
         const { password: _, ...usuarioSeguro } = nuevoUsuario;
         return {
             datos: {
-                token: `jwt-karenflix-${nuevoUsuario.id}-${Date.now()}`,
+                token: generarJwtFirmado(usuarioSeguro),
                 usuario: usuarioSeguro
             }
         };
@@ -621,6 +686,7 @@ export const demo = async (metodo, ruta, cuerpo) => {
     if (metodo === 'GET' && partes[0] === 'peliculas' && partes.length === 2) {
         const pelicula = db.peliculas.find((p) => p.id === Number(partes[1]));
         if (!pelicula) throw new Error('Película no encontrada');
+        calcularMetricasPelicula(db, pelicula);
         const lista = db.resenas
             .filter((r) => r.pelicula_id === pelicula.id)
             .sort((a, b) => b.id - a.id)
@@ -701,12 +767,14 @@ export const demo = async (metodo, ruta, cuerpo) => {
         if (previa === tipo) {
             resena[`${tipo}s`] = Math.max(0, resena[`${tipo}s`] - 1);
             delete db.misReacciones[id];
+            recalcularPelicula(db, resena.pelicula_id);
             guardarDB(db);
             return { datos: { ...resena, miReaccion: null } };
         }
         if (previa) resena[`${previa}s`] = Math.max(0, resena[`${previa}s`] - 1);
         resena[`${tipo}s`]++;
         db.misReacciones[id] = tipo;
+        recalcularPelicula(db, resena.pelicula_id);
         guardarDB(db);
         return { datos: { ...resena, miReaccion: tipo } };
     }
