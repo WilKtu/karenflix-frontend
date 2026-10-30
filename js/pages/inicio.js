@@ -1,4 +1,5 @@
 import { api } from '../api.js';
+import { getUsuario, esAdmin } from '../auth.js';
 import { toast, loader, escapar, raiz, estadoVacio } from '../ui.js';
 import { tarjetaPelicula } from '../components/tarjetaPelicula.js';
 import { montarNavbar } from '../components/navbar.js';
@@ -6,38 +7,105 @@ import { montarNavbar } from '../components/navbar.js';
 montarNavbar('inicio');
 
 const pintarHero = (p) => {
+    const actoresHtml =
+        Array.isArray(p.actores) && p.actores.length
+            ? `<div class="hero-chips">${p.actores
+                  .slice(0, 4)
+                  .map((a) => `<span class="actor-chip">🎭 ${escapar(typeof a === 'object' ? a.nombre : a)}</span>`)
+                  .join('')}</div>`
+            : '';
+
     document.getElementById('hero-contenido').innerHTML = `
-        <p class="eyebrow">Recomendación de la semana</p>
-        <h1>${escapar(p.titulo)}</h1>
-        <p class="muted">${escapar(p.descripcion)}</p>
+        <div class="hero-badges">
+            <span class="eyebrow badge-estreno">🍿 DESTACADA EN CARTELERA</span>
+            <span class="score-pill">★ ${Number(p.rating_promedio || 0).toFixed(1)} / 10</span>
+        </div>
+        <h1 class="titulo-cine-hero">${escapar(p.titulo)}</h1>
+        <p class="hero-meta">${p.anio} · ${escapar(p.categoria)} ${p.duracion_minutos ? `· ⏱️ ${p.duracion_minutos} min` : ''} ${p.director ? `· 🎥 Dir. ${escapar(p.director)}` : ''}</p>
+        <p class="muted hero-sinopsis">${escapar(p.descripcion)}</p>
+        ${actoresHtml}
         <div class="acciones">
-            <a class="btn btn-primario" href="${raiz}pages/detalle.html?id=${p.id}">Ver detalle</a>
-            <a class="btn" href="${raiz}pages/catalogo.html">Explorar catálogo</a>
+            <a class="btn btn-primario btn-glow" href="${raiz}pages/detalle.html?id=${p.id}">▶ Ver Tráiler y Reseñas</a>
+            <a class="btn" href="${raiz}pages/catalogo.html">🎞️ Explorar catálogo completo</a>
         </div>`;
+
     const poster = document.getElementById('hero-poster');
-    poster.style.setProperty('--h', (p.id * 47) % 360);
-    poster.textContent = p.titulo;
+    if (p.imagen_url && String(p.imagen_url).startsWith('http')) {
+        poster.style.backgroundImage = `linear-gradient(to top, rgba(7,10,18,0.85) 0%, transparent 50%), url('${p.imagen_url}')`;
+        poster.style.backgroundSize = 'cover';
+        poster.style.backgroundPosition = 'center';
+        poster.innerHTML = `<span class="hero-poster-caption">🎬 ${escapar(p.titulo)} (${p.anio})</span>`;
+    } else {
+        poster.style.setProperty('--h', (p.id * 47) % 360);
+        poster.textContent = p.titulo;
+    }
 };
 
 const pintarCarruseles = (lista) => {
-    const grupos = Object.groupBy(lista, (p) => p.categoria);
-    document.getElementById('categorias').innerHTML = Object.entries(grupos).map(([nombre, items]) => `
+    const grupos = {};
+    lista.forEach((p) => {
+        const cat = p.categoria || 'General';
+        if (!grupos[cat]) grupos[cat] = [];
+        grupos[cat].push(p);
+    });
+    document.getElementById('categorias').innerHTML = Object.entries(grupos)
+        .map(
+            ([nombre, items]) => `
         <section class="seccion">
-            <h2 class="titulo-seccion">${escapar(nombre)}</h2>
+            <div class="cabecera-fila">
+                <h2 class="titulo-seccion">🎬 ${escapar(nombre)}</h2>
+                <a class="btn-link" href="${raiz}pages/catalogo.html?categoria=${encodeURIComponent(nombre)}">Ver todo →</a>
+            </div>
             <div class="carrusel">${items.map(tarjetaPelicula).join('')}</div>
-        </section>`).join('');
+        </section>`
+        )
+        .join('');
+};
+
+const actualizarBannerComunidad = () => {
+    const usuario = getUsuario();
+    const secciones = document.querySelectorAll('main > section.seccion.contenedor');
+    const ultimaSeccion = secciones[secciones.length - 1];
+    if (!ultimaSeccion || !usuario) return;
+
+    const caja = ultimaSeccion.querySelector('.caja');
+    if (!caja) return;
+
+    caja.innerHTML = `
+        <p class="eyebrow">${esAdmin() ? '👑 MODO ADMINISTRADOR ACTIVO' : '🎬 SESIÓN DE MIEMBRO ACTIVA'}</p>
+        <h2 class="titulo-seccion">¡Hola de nuevo, ${escapar(usuario.nombre)}!</h2>
+        <p class="muted">${
+            esAdmin()
+                ? 'Tienes acceso total para aprobar propuestas de la comunidad, publicar películas en cartelera y gestionar categorías.'
+                : '¿Conoces una película o serie que falte en KAREN-FLIX? Propón nuevos títulos o califica tus favoritos.'
+        }</p>
+        <div class="acciones">
+            <button class="btn btn-primario" type="button" onclick="document.getElementById('btn-proponer-global')?.click()">➕ Proponer Película</button>
+            ${
+                esAdmin()
+                    ? `<a class="btn btn-admin-nav" href="${raiz}pages/admin.html">⚙️ Abrir Panel de Administración</a>`
+                    : `<button class="btn" type="button" onclick="document.getElementById('btn-abrir-perfil')?.click()">👤 Editar mi Perfil</button>`
+            }
+        </div>
+    `;
 };
 
 const cargar = async () => {
     loader(true);
+    actualizarBannerComunidad();
     try {
         const { datos: ranking } = await api.get('/peliculas?orden=ranking&limit=10');
         const { datos: populares } = await api.get('/peliculas?orden=popularidad&limit=4');
         if (!ranking.length) return;
         pintarHero(ranking[0]);
         document.getElementById('populares-lista').innerHTML = populares.map(tarjetaPelicula).join('');
-        document.getElementById('top10').innerHTML = ranking.map((p, i) =>
-            `<div><span class="top-numero">#${i + 1}</span>${tarjetaPelicula(p)}</div>`).join('') || estadoVacio('Sin datos');
+        document.getElementById('top10').innerHTML =
+            ranking
+                .map(
+                    (p, i) =>
+                        `<div class="top-card-wrap"><span class="top-numero">#${i + 1}</span>${tarjetaPelicula(p)}</div>`
+                )
+                .join('') || estadoVacio('Sin datos');
         pintarCarruseles(ranking);
     } catch (error) {
         toast(error.message, 'error');
@@ -46,7 +114,10 @@ const cargar = async () => {
     }
 };
 
-document.querySelectorAll('[data-scroll]').forEach((b) => b.addEventListener('click', () =>
-    document.getElementById('top10').scrollBy({ left: Number(b.dataset.scroll) * 460, behavior: 'smooth' })));
+document.querySelectorAll('[data-scroll]').forEach((b) =>
+    b.addEventListener('click', () =>
+        document.getElementById('top10').scrollBy({ left: Number(b.dataset.scroll) * 460, behavior: 'smooth' })
+    )
+);
 
 cargar();

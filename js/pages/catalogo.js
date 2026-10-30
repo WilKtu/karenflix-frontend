@@ -6,7 +6,15 @@ import { montarNavbar } from '../components/navbar.js';
 montarNavbar('catalogo');
 
 const LIMITE = 8;
-const filtros = { q: new URLSearchParams(location.search).get('q') || '', categoria: '', tipo: '', anio: '', orden: 'ranking' };
+const urlParams = new URLSearchParams(location.search);
+const filtros = {
+    q: urlParams.get('q') || '',
+    categoria: urlParams.get('categoria') || '',
+    categoria_id: '',
+    tipo: '',
+    anio: '',
+    orden: 'ranking'
+};
 let pagina = 1;
 
 const lista = document.getElementById('lista');
@@ -20,7 +28,9 @@ const cargar = async (reiniciar) => {
     try {
         const { datos, total } = await api.get(`/peliculas?${params}`);
         const html = datos.map(tarjetaPelicula).join('');
-        lista.innerHTML = reiniciar ? html || estadoVacio('No se encontraron resultados') : lista.innerHTML + html;
+        lista.innerHTML = reiniciar
+            ? html || estadoVacio('No se encontraron producciones con esos filtros.')
+            : lista.innerHTML + html;
         botonMas.hidden = pagina * LIMITE >= total;
     } catch (error) {
         toast(error.message, 'error');
@@ -32,12 +42,19 @@ const cargar = async (reiniciar) => {
 const pintarCategorias = async () => {
     const { datos } = await api.get('/categorias');
     const chips = document.getElementById('chips');
-    chips.innerHTML = [{ nombre: '' }, ...datos].map((c) =>
-        `<button type="button" class="btn chip" data-cat="${c.nombre}" aria-pressed="${c.nombre === ''}">${c.nombre || 'Todas'}</button>`).join('');
+    chips.innerHTML = [{ id: '', nombre: '' }, ...datos]
+        .map(
+            (c) =>
+                `<button type="button" class="btn chip" data-cat="${c.nombre}" data-cat-id="${c.id || ''}" aria-pressed="${
+                    c.nombre === filtros.categoria
+                }">${c.nombre ? `🎬 ${c.nombre}` : '🍿 Todas'}</button>`
+        )
+        .join('');
     chips.addEventListener('click', (e) => {
         const chip = e.target.closest('.chip');
         if (!chip) return;
         filtros.categoria = chip.dataset.cat;
+        filtros.categoria_id = chip.dataset.catId;
         chips.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
         cargar(true);
     });
