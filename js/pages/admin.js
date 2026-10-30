@@ -53,7 +53,7 @@ const cargarTodo = async () => {
         const [categorias, peliculas, pendientes] = await Promise.all([
             api.get('/categorias'),
             api.get('/peliculas?orden=recientes&limit=50'),
-            api.get('/peliculas/pendientes')
+            api.get('/peliculas/admin/pendientes')
         ]);
         datos.categorias = categorias.datos;
         datos.peliculas = peliculas.datos;
@@ -73,6 +73,30 @@ const mostrarVista = (vista) => {
 };
 
 // ---------- Diálogos ----------
+
+// HU-17: Previsualización de póster en vivo
+const actualizarPreviewPoster = (url) => {
+    const img = $('p-poster-preview');
+    const ph = $('p-poster-placeholder');
+    if (!url || !url.trim().startsWith('http')) {
+        img.hidden = true;
+        img.src = '';
+        ph.hidden = false;
+        ph.textContent = 'Ingresa una URL de imagen válida para previsualizar';
+        return;
+    }
+    img.src = url.trim();
+    img.onload = () => {
+        img.hidden = false;
+        ph.hidden = true;
+    };
+    img.onerror = () => {
+        img.hidden = true;
+        ph.hidden = false;
+        ph.textContent = 'No se pudo cargar la imagen. Verifica el enlace.';
+    };
+};
+
 const idCategoria = (p) => p.categoria_id ?? datos.categorias.find((c) => c.nombre === p.categoria)?.id ?? '';
 
 const abrirCategoria = (categoria) => {
@@ -95,11 +119,19 @@ const abrirPelicula = (pelicula) => {
     $('titulo-dlg-pelicula').textContent = pelicula ? 'Editar película' : 'Nueva película';
     $('error-pelicula').textContent = '';
     if (pelicula) {
-        form.titulo.value = pelicula.titulo;
+        form.titulo.value = pelicula.titulo || '';
         form.descripcion.value = pelicula.descripcion || '';
-        form.tipo.value = pelicula.tipo;
-        form.anio.value = pelicula.anio;
+        form.tipo.value = pelicula.tipo || 'pelicula';
+        form.anio.value = pelicula.anio || '';
         form.categoria_id.value = idCategoria(pelicula);
+        form.duracion_minutos.value = pelicula.duracion_minutos || '';
+        form.director.value = pelicula.director || '';
+        form.actores.value = Array.isArray(pelicula.actores) ? pelicula.actores.map(a => typeof a === 'object' ? a.nombre : a).join(', ') : (pelicula.actores || '');
+        form.trailer_url.value = pelicula.trailer_url || '';
+        form.imagen_url.value = pelicula.imagen_url || '';
+        actualizarPreviewPoster(pelicula.imagen_url);
+    } else {
+        actualizarPreviewPoster('');
     }
     $('dlg-pelicula').showModal();
 };
@@ -132,12 +164,23 @@ $('form-pelicula').addEventListener('submit', (e) => {
     if (form.titulo.value.trim().length < 2) return ($('error-pelicula').textContent = 'Escribe un título válido.');
     if (!Number.isInteger(anio) || anio < 1900 || anio > 2100) return ($('error-pelicula').textContent = 'El año debe estar entre 1900 y 2100.');
     if (!form.categoria_id.value) return ($('error-pelicula').textContent = 'Crea y elige una categoría.');
+
+    const actores = form.actores.value
+        .split(',')
+        .map((a) => a.trim())
+        .filter(Boolean);
+
     guardar(form, '/peliculas', {
         titulo: form.titulo.value.trim(),
         descripcion: form.descripcion.value.trim(),
         tipo: form.tipo.value,
         anio,
-        categoria_id: Number(form.categoria_id.value)
+        categoria_id: Number(form.categoria_id.value),
+        duracion_minutos: form.duracion_minutos.value ? Number(form.duracion_minutos.value) : null,
+        director: form.director.value.trim() || null,
+        actores: actores.length ? actores : [],
+        trailer_url: form.trailer_url.value.trim() || null,
+        imagen_url: form.imagen_url.value.trim() || null
     }, 'error-pelicula', 'dlg-pelicula');
 });
 
@@ -153,7 +196,7 @@ const ejecutar = async (peticion, mensaje) => {
 };
 
 const buscar = (lista, id) => lista.find((x) => x.id === Number(id));
-const cambiarEstado = (id, estado, mensaje) => ejecutar(() => api.patch(`/peliculas/${id}/estado`, { estado }), mensaje);
+const cambiarEstado = (id, estado, mensaje) => ejecutar(() => api.patch(`/peliculas/admin/${id}/estado`, { estado }), mensaje);
 
 const acciones = {
     aprobar: (id) => cambiarEstado(id, 'aprobada', 'Película aprobada'),

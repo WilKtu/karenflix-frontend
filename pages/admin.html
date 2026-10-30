@@ -65,13 +65,43 @@
     <dialog id="dlg-pelicula" aria-labelledby="titulo-dlg-pelicula">
         <form id="form-pelicula" novalidate>
             <h2 id="titulo-dlg-pelicula">Nueva película</h2>
-            <div class="campo"><label for="p-titulo">Título</label><input id="p-titulo" name="titulo" maxlength="120"></div>
-            <div class="campo"><label for="p-desc">Descripción</label><textarea id="p-desc" name="descripcion" rows="3"></textarea></div>
-            <div class="campo"><label for="p-tipo">Tipo</label>
-                <select id="p-tipo" name="tipo"><option value="pelicula">Película</option><option value="serie">Serie</option><option value="anime">Anime</option><option value="documental">Documental</option></select>
+            <div class="campo"><label for="p-titulo">Título *</label><input id="p-titulo" name="titulo" maxlength="120" required></div>
+            <div class="campo"><label for="p-desc">Descripción *</label><textarea id="p-desc" name="descripcion" rows="3" required></textarea></div>
+            
+            <div class="grid-form-2">
+                <div class="campo"><label for="p-tipo">Tipo</label>
+                    <select id="p-tipo" name="tipo">
+                        <option value="pelicula">Película</option>
+                        <option value="serie">Serie</option>
+                        <option value="anime">Anime</option>
+                    </select>
+                </div>
+                <div class="campo"><label for="p-anio">Año *</label><input id="p-anio" name="anio" type="number" min="1900" max="2100" required></div>
             </div>
-            <div class="campo"><label for="p-anio">Año</label><input id="p-anio" name="anio" type="number" min="1900" max="2100"></div>
-            <div class="campo"><label for="p-categoria">Categoría</label><select id="p-categoria" name="categoria_id"></select></div>
+
+            <div class="grid-form-2">
+                <div class="campo"><label for="p-duracion">Duración (minutos)</label><input id="p-duracion" name="duracion_minutos" type="number" min="1" max="600" placeholder="Ej: 120"></div>
+                <div class="campo"><label for="p-categoria">Categoría *</label><select id="p-categoria" name="categoria_id" required></select></div>
+            </div>
+
+            <div class="campo"><label for="p-director">Director</label><input id="p-director" name="director" maxlength="150" placeholder="Ej: Christopher Nolan"></div>
+            <div class="campo"><label for="p-actores">Actores (separados por coma)</label><input id="p-actores" name="actores" maxlength="255" placeholder="Ej: Leonardo DiCaprio, Joseph Gordon-Levitt"></div>
+
+            <div class="campo"><label for="p-trailer">Enlace de Tráiler (YouTube)</label><input id="p-trailer" name="trailer_url" type="url" placeholder="https://www.youtube.com/watch?v=..."></div>
+
+            <!-- HU-17: Subida y visualización de pósters en vivo -->
+            <div class="campo">
+                <label for="p-imagen">URL del Póster (Imagen) *</label>
+                <input id="p-imagen" name="imagen_url" type="url" placeholder="https://image.tmdb.org/t/p/... o enlace web" required>
+            </div>
+            <div class="poster-preview-wrap">
+                <span class="preview-label">Previsualización del póster (HU-17):</span>
+                <div class="poster-preview-box">
+                    <img id="p-poster-preview" src="" alt="Previsualización" class="poster-preview-img" hidden>
+                    <p id="p-poster-placeholder" class="poster-placeholder">Ingresa una URL de imagen válida para previsualizar</p>
+                </div>
+            </div>
+
             <p class="error-campo" id="error-pelicula" role="alert"></p>
             <div class="acciones">
                 <button class="btn btn-primario" type="submit">Guardar</button>
