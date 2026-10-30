@@ -11,9 +11,9 @@ import { raiz, aplicarTema, alternarTema, escapar, toast } from '../ui.js';
 
 const enlaces = (activa) =>
     [
-        ['inicio', '🍿 Inicio', `${raiz}index.html`],
-        ['populares', '🔥 Populares', `${raiz}index.html#populares`],
-        ['catalogo', '🎞️ Catálogo', `${raiz}pages/catalogo.html`]
+        ['inicio', 'Inicio', `${raiz}index.html`],
+        ['populares', 'Populares', `${raiz}index.html#populares`],
+        ['catalogo', 'Catálogo', `${raiz}pages/catalogo.html`]
     ]
         .map(
             ([id, texto, href]) =>
@@ -45,6 +45,8 @@ const renderizarNotificaciones = () => {
         .join('');
 };
 
+const iconoCampanaSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>`;
+
 const botonesSesion = () => {
     const usuario = getUsuario();
     if (!usuario) {
@@ -55,19 +57,18 @@ const botonesSesion = () => {
     const notifs = getNotificaciones();
     const sinLeer = notifs.filter((n) => !n.leida).length;
     const rolBadge = esAdmin()
-        ? `<span class="rol-badge rol-admin" title="Cuenta con privilegios de Administrador">👑 ADMIN</span>`
-        : `<span class="rol-badge rol-user" title="Cuenta de Miembro Registrado">🎬 MIEMBRO</span>`;
+        ? `<span class="rol-badge rol-admin" title="Cuenta de Administrador">Admin</span>`
+        : `<span class="rol-badge rol-user" title="Cuenta de Miembro">Miembro</span>`;
 
-    const btnAdmin = esAdmin()
-        ? `<a class="btn btn-admin-nav" href="${raiz}pages/admin.html">⚙️ Panel Admin</a>`
-        : '';
+    const btnAccionRol = esAdmin()
+        ? `<a class="btn btn-sm btn-admin-nav" href="${raiz}pages/admin.html">Panel Admin</a>`
+        : `<button class="btn btn-sm btn-proponer-nav" id="btn-proponer-global" type="button" title="Sugerir una película o serie">+ Proponer título</button>`;
 
     return `
-        <button class="btn btn-sm btn-proponer-nav" id="btn-proponer-global" type="button" title="Sugerir una película o serie al catálogo">➕ Proponer título</button>
-        ${btnAdmin}
+        ${btnAccionRol}
         <div class="notif-contenedor">
-            <button class="btn btn-icono notif-btn" id="btn-notificaciones" type="button" aria-label="Notificaciones" title="Centro de notificaciones">
-                🔔
+            <button class="btn btn-icono notif-btn" id="btn-notificaciones" type="button" aria-label="Notificaciones" title="Notificaciones">
+                ${iconoCampanaSvg}
                 ${sinLeer > 0 ? `<span class="notif-contador" id="notif-contador">${sinLeer}</span>` : ''}
             </button>
             <div class="notif-dropdown" id="notif-dropdown" hidden>
@@ -80,12 +81,12 @@ const botonesSesion = () => {
                 </div>
             </div>
         </div>
-        <button class="btn btn-perfil" id="btn-abrir-perfil" type="button" title="Ver y editar mi perfil">
+        <button class="btn btn-perfil" id="btn-abrir-perfil" type="button" title="Editar mi perfil">
             <span class="avatar-mini">${escapar(usuario.nombre.charAt(0).toUpperCase())}</span>
             <span class="perfil-nombre">${escapar(usuario.nombre.split(' ')[0])}</span>
             ${rolBadge}
         </button>
-        <button class="btn btn-icono btn-salir-icono" id="btn-salir" type="button" title="Cerrar sesión" aria-label="Cerrar sesión">⏻</button>
+        <button class="btn btn-sm btn-salir-icono" id="btn-salir" type="button" title="Cerrar sesión">Salir</button>
     `;
 };
 
@@ -100,11 +101,11 @@ const inyectarModalesGlobales = () => {
             <form id="form-perfil-global" novalidate>
                 <div class="modal-cabecera-cine">
                     <div>
-                        <p class="eyebrow">Configuración de Cuenta</p>
-                        <h2 id="titulo-dlg-perfil">Mi Perfil de Cine</h2>
+                        <p class="eyebrow">Configuración de cuenta</p>
+                        <h2 id="titulo-dlg-perfil">Editar mi perfil</h2>
                     </div>
                     <span class="rol-badge ${esAdmin() ? 'rol-admin' : 'rol-user'}">
-                        ${esAdmin() ? '👑 Administrador' : '🎬 Usuario Registrado'}
+                        ${esAdmin() ? 'Administrador' : 'Miembro'}
                     </span>
                 </div>
 
@@ -120,7 +121,7 @@ const inyectarModalesGlobales = () => {
 
                 <div class="grid-form-2">
                     <div class="campo">
-                        <label for="perf-genero">Género cinematográfico favorito</label>
+                        <label for="perf-genero">Género favorito</label>
                         <select id="perf-genero" name="genero_favorito">
                             <option value="Ciencia ficción" ${usuario.genero_favorito === 'Ciencia ficción' ? 'selected' : ''}>Ciencia ficción</option>
                             <option value="Acción" ${usuario.genero_favorito === 'Acción' ? 'selected' : ''}>Acción</option>
@@ -137,8 +138,8 @@ const inyectarModalesGlobales = () => {
                 </div>
 
                 <div class="campo">
-                    <label for="perf-bio">Biografía / Frase de cine</label>
-                    <textarea id="perf-bio" name="bio" rows="2" maxlength="180" placeholder="Cuéntanos qué tipo de películas te apasionan...">${escapar(usuario.bio || '')}</textarea>
+                    <label for="perf-bio">Biografía corta</label>
+                    <textarea id="perf-bio" name="bio" rows="2" maxlength="180" placeholder="Cuéntanos qué tipo de películas te gustan...">${escapar(usuario.bio || '')}</textarea>
                 </div>
 
                 <p class="error-campo" id="error-perfil-global" role="alert"></p>
@@ -154,15 +155,15 @@ const inyectarModalesGlobales = () => {
             <form id="form-proponer-global" novalidate>
                 <div class="modal-cabecera-cine">
                     <div>
-                        <p class="eyebrow">Aporte a la Comunidad</p>
-                        <h2 id="titulo-dlg-proponer">${esAdmin() ? 'Publicar Nueva Película' : 'Proponer Película o Serie'}</h2>
+                        <p class="eyebrow">Catálogo colaborativo</p>
+                        <h2 id="titulo-dlg-proponer">${esAdmin() ? 'Publicar nueva película' : 'Proponer película o serie'}</h2>
                     </div>
                 </div>
                 <p class="muted" style="margin-bottom:1rem;font-size:0.85rem;">
                     ${
                         esAdmin()
                             ? 'Como administrador, el título quedará aprobado y visible en cartelera inmediatamente.'
-                            : 'Tu propuesta será enviada con estado "Pendiente" para que el Administrador la revise y apruebe.'
+                            : 'Tu propuesta será enviada con estado "Pendiente" para revisión del administrador.'
                     }
                 </p>
 
@@ -173,7 +174,7 @@ const inyectarModalesGlobales = () => {
 
                 <div class="campo">
                     <label for="prop-desc">Sinopsis / Descripción *</label>
-                    <textarea id="prop-desc" name="descripcion" rows="2" placeholder="Describe brevemente la trama sin spoilers..." required></textarea>
+                    <textarea id="prop-desc" name="descripcion" rows="2" placeholder="Describe brevemente la trama..." required></textarea>
                 </div>
 
                 <div class="grid-form-2">
@@ -225,10 +226,10 @@ const inyectarModalesGlobales = () => {
                 </div>
 
                 <div class="poster-preview-wrap">
-                    <span class="preview-label">Previsualización del póster en vivo:</span>
+                    <span class="preview-label">Previsualización del póster:</span>
                     <div class="poster-preview-box">
                         <img id="prop-poster-preview" src="" alt="Vista previa" class="poster-preview-img" hidden>
-                        <p id="prop-poster-placeholder" class="poster-placeholder">Pega un enlace de imagen para previsualizar el póster</p>
+                        <p id="prop-poster-placeholder" class="poster-placeholder">Pega un enlace de imagen para previsualizar</p>
                     </div>
                 </div>
 
@@ -271,7 +272,7 @@ const inyectarModalesGlobales = () => {
             });
             actualizarUsuarioSesion(datos);
             dlgPerfil.close();
-            toast('¡Perfil actualizado correctamente!');
+            toast('Perfil actualizado correctamente');
             montarNavbar('');
         } catch (err) {
             errEl.textContent = err.message;
@@ -342,8 +343,8 @@ const inyectarModalesGlobales = () => {
             phPrev.hidden = false;
             toast(
                 esAdmin()
-                    ? '🎬 ¡Película publicada directamente en cartelera!'
-                    : '📥 ¡Propuesta enviada! El administrador la revisará pronto.'
+                    ? 'Película publicada directamente en cartelera'
+                    : 'Propuesta enviada para revisión del administrador'
             );
             setTimeout(() => location.reload(), 900);
         } catch (err) {
@@ -361,14 +362,14 @@ export const montarNavbar = (activa) => {
         <div class="cinta-cine" aria-hidden="true"></div>
         <div class="navbar"><div class="contenedor navbar-fila">
             <button class="btn btn-icono" id="btn-menu" type="button" aria-label="Abrir menú" aria-expanded="false">☰</button>
-            <a class="logo" href="${raiz}index.html">🎬 KAREN<span>-FLIX</span></a>
+            <a class="logo" href="${raiz}index.html">KAREN<span>-FLIX</span></a>
             <nav class="nav-links" aria-label="Principal">${enlaces(activa)}</nav>
             <form class="buscador" id="form-buscar" role="search">
-                <input type="search" id="buscar" placeholder="Buscar película, director..." aria-label="Buscar títulos">
-                <button class="btn" type="submit">🔍</button>
+                <input type="search" id="buscar" placeholder="Buscar títulos..." aria-label="Buscar títulos">
+                <button class="btn" type="submit">Buscar</button>
             </form>
             <div class="nav-acciones">
-                <button class="btn btn-icono" id="btn-tema" type="button" title="Cambiar ambiente de luz" aria-label="Cambiar entre tema claro y oscuro">◐</button>
+                <button class="btn btn-icono" id="btn-tema" type="button" title="Cambiar tema claro/oscuro" aria-label="Cambiar entre tema claro y oscuro">◐</button>
                 ${botonesSesion()}
             </div>
         </div></div>
@@ -447,7 +448,7 @@ export const montarNavbar = (activa) => {
     // Evento de Cerrar Sesión
     document.getElementById('btn-salir')?.addEventListener('click', () => {
         cerrarSesion();
-        toast('Sesión cerrada. ¡Hasta la próxima función!');
+        toast('Sesión cerrada correctamente');
         setTimeout(() => (location.href = `${raiz}index.html`), 500);
     });
 };

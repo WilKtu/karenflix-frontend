@@ -10,21 +10,20 @@
     <div id="cortina-cine" class="cortina-cine" hidden></div>
     <div id="navbar"></div>
     <main class="contenedor seccion">
-        <div id="info"><p class="muted">Cargando proyección...</p></div>
+        <div id="info"><p class="muted">Cargando...</p></div>
 
         <section class="seccion" id="seccion-resenas">
-            <p class="eyebrow">Crítica y Comunidad</p>
-            <h2 class="titulo-seccion">Reseñas de Espectadores</h2>
+            <p class="eyebrow">Comunidad</p>
+            <h2 class="titulo-seccion">Reseñas</h2>
 
             <!-- Bloque para visitantes NO autenticados -->
             <div class="caja caja-login-resena" id="bloque-login-resena" hidden>
-                <div class="login-resena-icono">🎟️</div>
                 <div>
                     <h3>Para colocar una reseña, inicia sesión aquí</h3>
-                    <p class="muted">Comparte tu calificación con estrellas, escribe tu crítica y vota las opiniones de otros espectadores.</p>
+                    <p class="muted">Comparte tu calificación del 1 al 10, escribe tu crítica y vota las opiniones de otros espectadores.</p>
                     <div class="acciones">
-                        <a class="btn btn-primario btn-glow" id="link-login-retorno" href="login.html">🔑 Iniciar sesión aquí</a>
-                        <a class="btn" id="link-registro-retorno" href="login.html?modo=registro">✨ Crear cuenta gratis</a>
+                        <a class="btn btn-primario" id="link-login-retorno" href="login.html">Iniciar sesión aquí</a>
+                        <a class="btn" id="link-registro-retorno" href="login.html?modo=registro">Crear cuenta</a>
                     </div>
                 </div>
             </div>
@@ -32,21 +31,21 @@
             <!-- Formulario interactivo para usuarios autenticados (Crear / Editar reseña) -->
             <form class="caja form-resena-cine" id="form-resena" novalidate hidden>
                 <div class="form-resena-cabecera">
-                    <h3 id="titulo-form-resena">✍️ Escribe tu reseña</h3>
+                    <h3 id="titulo-form-resena">Escribe tu reseña</h3>
                     <span class="muted" id="autor-form-resena"></span>
                 </div>
                 <input type="hidden" id="resena-edit-id" value="">
                 <div class="campo">
                     <label for="titulo">Título de tu reseña *</label>
-                    <input id="titulo" maxlength="80" placeholder="Ej: Una obra maestra de la ciencia ficción" required>
+                    <input id="titulo" maxlength="80" placeholder="Resume tu opinión en una frase" required>
                 </div>
                 <div class="campo">
-                    <label>Tu Calificación (1 a 10 estrellas) *</label>
+                    <label>Calificación (1 a 10) *</label>
                     <div id="selector-nota"></div>
                 </div>
                 <div class="campo">
-                    <label for="comentario">Tu opinión detallada *</label>
-                    <textarea id="comentario" rows="3" maxlength="500" placeholder="Comparte qué te pareció la dirección, actuaciones y trama (máximo 500 caracteres)" required></textarea>
+                    <label for="comentario">Comentario *</label>
+                    <textarea id="comentario" rows="3" maxlength="500" placeholder="Comparte tu crítica sobre la película o serie (máximo 500 caracteres)" required></textarea>
                     <span class="muted" id="contador">0/500</span>
                 </div>
                 <p class="error-campo" id="error-resena" role="alert"></p>
@@ -60,7 +59,7 @@
         </section>
     </main>
     <footer class="footer"><div class="contenedor footer-grid">
-        <div><a class="logo" href="../index.html">🎬 KAREN<span>-FLIX</span></a><p>Descubre nuevas historias, películas y universos por explorar</p></div>
+        <div><a class="logo" href="../index.html">KAREN<span>-FLIX</span></a><p>Descubre nuevas historias, películas y universos por explorar</p></div>
         <nav aria-label="Pie"><a href="../index.html">Inicio</a> · <a href="../pages/catalogo.html">Catálogo</a></nav>
     </div></footer>
     <script type="module" src="../js/pages/detalle.js"></script>

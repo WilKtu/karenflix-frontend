@@ -15,6 +15,8 @@ const cajaAuth = document.getElementById('caja-auth');
 const limpiarAlertas = () => {
     document.getElementById('alerta-login').hidden = true;
     document.getElementById('alerta-registro').hidden = true;
+    document.getElementById('error-login-txt').textContent = '';
+    document.getElementById('error-registro-txt').textContent = '';
     document.querySelectorAll('.input-invalido').forEach((el) => el.classList.remove('input-invalido'));
 };
 
@@ -33,7 +35,7 @@ document.querySelectorAll('[data-toggle-pass]').forEach((btn) => {
         const input = document.getElementById(btn.dataset.togglePass);
         if (!input) return;
         input.type = input.type === 'password' ? 'text' : 'password';
-        btn.textContent = input.type === 'password' ? '👁️' : '🙈';
+        btn.textContent = input.type === 'password' ? 'Ver' : 'Ocultar';
     });
 });
 
@@ -84,7 +86,7 @@ const validar = (datos, esRegistro) => {
     }
     if (!correoValido(datos.email)) {
         return {
-            msg: 'El formato del correo es incorrecto. Asegúrate de incluir "@" y un dominio válido (ej: nombre@correo.com).',
+            msg: 'El formato del correo es incorrecto. Incluye "@" y un dominio válido (ej: nombre@correo.com).',
             campo: esRegistro ? 'r-email' : 'l-email'
         };
     }
@@ -114,7 +116,7 @@ const enviar = (modo) => async (e) => {
     }
 
     boton.disabled = true;
-    boton.textContent = 'Verificando credenciales...';
+    boton.textContent = 'Verificando...';
     try {
         const cuerpo =
             modo === 'registro'
@@ -124,8 +126,8 @@ const enviar = (modo) => async (e) => {
         const { datos: sesion } = await api.post(`/auth/${modo === 'registro' ? 'register' : 'login'}`, cuerpo);
         guardarSesion(sesion.token, sesion.usuario);
 
-        const rolTexto = sesion.usuario.rol === 'admin' ? '👑 Administrador' : '🎬 Miembro';
-        toast(`¡Bienvenido(a) ${sesion.usuario.nombre} (${rolTexto})!`);
+        const rolTexto = sesion.usuario.rol === 'admin' ? 'Administrador' : 'Miembro';
+        toast(`Sesión iniciada: ${sesion.usuario.nombre} (${rolTexto})`);
 
         const redirectParam = new URLSearchParams(location.search).get('redirect');
         setTimeout(() => {
@@ -136,12 +138,12 @@ const enviar = (modo) => async (e) => {
             } else {
                 location.href = `${raiz}index.html`;
             }
-        }, 700);
+        }, 650);
     } catch (error) {
         mostrarError(modo, error.message);
         toast(error.message, 'error');
         boton.disabled = false;
-        boton.textContent = modo === 'registro' ? '✨ Registrarme como Miembro' : '🎟️ Entrar a KAREN-FLIX';
+        boton.textContent = modo === 'registro' ? 'Crear cuenta' : 'Iniciar sesión';
     }
 };
 
@@ -150,18 +152,18 @@ document.getElementById('btn-fill-admin')?.addEventListener('click', () => {
     mostrar('login');
     document.getElementById('l-email').value = 'admin@karenflix.com';
     document.getElementById('l-pass').value = 'Admin1234!';
-    hintLoginEmail.textContent = '✓ Cuenta de Administrador cargada (Contraseña: Admin1234!)';
+    hintLoginEmail.textContent = '✓ Cuenta de Administrador lista';
     hintLoginEmail.style.color = 'var(--ok)';
-    toast('Credenciales de Administrador listas. Presiona "Entrar"');
+    toast('Credenciales de Administrador cargadas');
 });
 
 document.getElementById('btn-fill-user')?.addEventListener('click', () => {
     mostrar('login');
     document.getElementById('l-email').value = 'wilder@karenflix.com';
     document.getElementById('l-pass').value = 'Wilder1234!';
-    hintLoginEmail.textContent = '✓ Cuenta de Usuario cargada (Contraseña: Wilder1234!)';
+    hintLoginEmail.textContent = '✓ Cuenta de Usuario lista';
     hintLoginEmail.style.color = 'var(--ok)';
-    toast('Credenciales de Usuario Estándar listas. Presiona "Entrar"');
+    toast('Credenciales de Usuario cargadas');
 });
 
 formularios.login.addEventListener('submit', enviar('login'));

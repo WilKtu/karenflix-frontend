@@ -11,30 +11,30 @@ const pintarHero = (p) => {
         Array.isArray(p.actores) && p.actores.length
             ? `<div class="hero-chips">${p.actores
                   .slice(0, 4)
-                  .map((a) => `<span class="actor-chip">🎭 ${escapar(typeof a === 'object' ? a.nombre : a)}</span>`)
+                  .map((a) => `<span class="actor-chip">${escapar(typeof a === 'object' ? a.nombre : a)}</span>`)
                   .join('')}</div>`
             : '';
 
     document.getElementById('hero-contenido').innerHTML = `
         <div class="hero-badges">
-            <span class="eyebrow badge-estreno">🍿 DESTACADA EN CARTELERA</span>
+            <span class="eyebrow badge-estreno">Recomendación de la semana</span>
             <span class="score-pill">★ ${Number(p.rating_promedio || 0).toFixed(1)} / 10</span>
         </div>
         <h1 class="titulo-cine-hero">${escapar(p.titulo)}</h1>
-        <p class="hero-meta">${p.anio} · ${escapar(p.categoria)} ${p.duracion_minutos ? `· ⏱️ ${p.duracion_minutos} min` : ''} ${p.director ? `· 🎥 Dir. ${escapar(p.director)}` : ''}</p>
+        <p class="hero-meta">${p.anio} · ${escapar(p.categoria)}${p.duracion_minutos ? ` · ${p.duracion_minutos} min` : ''}${p.director ? ` · Dir. ${escapar(p.director)}` : ''}</p>
         <p class="muted hero-sinopsis">${escapar(p.descripcion)}</p>
         ${actoresHtml}
         <div class="acciones">
-            <a class="btn btn-primario btn-glow" href="${raiz}pages/detalle.html?id=${p.id}">▶ Ver Tráiler y Reseñas</a>
-            <a class="btn" href="${raiz}pages/catalogo.html">🎞️ Explorar catálogo completo</a>
+            <a class="btn btn-primario" href="${raiz}pages/detalle.html?id=${p.id}">Ver detalle y tráiler</a>
+            <a class="btn" href="${raiz}pages/catalogo.html">Explorar catálogo</a>
         </div>`;
 
     const poster = document.getElementById('hero-poster');
     if (p.imagen_url && String(p.imagen_url).startsWith('http')) {
-        poster.style.backgroundImage = `linear-gradient(to top, rgba(7,10,18,0.85) 0%, transparent 50%), url('${p.imagen_url}')`;
+        poster.style.backgroundImage = `linear-gradient(to top, rgba(7,13,25,0.88) 0%, transparent 45%), url('${p.imagen_url}')`;
         poster.style.backgroundSize = 'cover';
         poster.style.backgroundPosition = 'center';
-        poster.innerHTML = `<span class="hero-poster-caption">🎬 ${escapar(p.titulo)} (${p.anio})</span>`;
+        poster.innerHTML = `<span class="hero-poster-caption">${escapar(p.titulo)} (${p.anio})</span>`;
     } else {
         poster.style.setProperty('--h', (p.id * 47) % 360);
         poster.textContent = p.titulo;
@@ -53,7 +53,7 @@ const pintarCarruseles = (lista) => {
             ([nombre, items]) => `
         <section class="seccion">
             <div class="cabecera-fila">
-                <h2 class="titulo-seccion">🎬 ${escapar(nombre)}</h2>
+                <h2 class="titulo-seccion">${escapar(nombre)}</h2>
                 <a class="btn-link" href="${raiz}pages/catalogo.html?categoria=${encodeURIComponent(nombre)}">Ver todo →</a>
             </div>
             <div class="carrusel">${items.map(tarjetaPelicula).join('')}</div>
@@ -72,19 +72,20 @@ const actualizarBannerComunidad = () => {
     if (!caja) return;
 
     caja.innerHTML = `
-        <p class="eyebrow">${esAdmin() ? '👑 MODO ADMINISTRADOR ACTIVO' : '🎬 SESIÓN DE MIEMBRO ACTIVA'}</p>
-        <h2 class="titulo-seccion">¡Hola de nuevo, ${escapar(usuario.nombre)}!</h2>
+        <p class="eyebrow">${esAdmin() ? 'Modo Administrador' : 'Sesión activa'}</p>
+        <h2 class="titulo-seccion">Hola, ${escapar(usuario.nombre)}</h2>
         <p class="muted">${
             esAdmin()
-                ? 'Tienes acceso total para aprobar propuestas de la comunidad, publicar películas en cartelera y gestionar categorías.'
-                : '¿Conoces una película o serie que falte en KAREN-FLIX? Propón nuevos títulos o califica tus favoritos.'
+                ? 'Puedes moderar propuestas pendientes, publicar títulos en cartelera y gestionar las categorías.'
+                : '¿Conoces una película o serie que falte en KAREN-FLIX? Propón nuevos títulos o reseña tus favoritos.'
         }</p>
         <div class="acciones">
-            <button class="btn btn-primario" type="button" onclick="document.getElementById('btn-proponer-global')?.click()">➕ Proponer Película</button>
             ${
                 esAdmin()
-                    ? `<a class="btn btn-admin-nav" href="${raiz}pages/admin.html">⚙️ Abrir Panel de Administración</a>`
-                    : `<button class="btn" type="button" onclick="document.getElementById('btn-abrir-perfil')?.click()">👤 Editar mi Perfil</button>`
+                    ? `<a class="btn btn-primario" href="${raiz}pages/admin.html">Ir al Panel de Administración</a>
+                       <button class="btn" type="button" onclick="document.getElementById('btn-abrir-perfil')?.click()">Editar mi perfil</button>`
+                    : `<button class="btn btn-primario" type="button" onclick="document.getElementById('btn-proponer-global')?.click()">+ Proponer título</button>
+                       <button class="btn" type="button" onclick="document.getElementById('btn-abrir-perfil')?.click()">Editar mi perfil</button>`
             }
         </div>
     `;

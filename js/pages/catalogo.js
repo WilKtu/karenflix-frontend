@@ -47,7 +47,7 @@ const pintarCategorias = async () => {
             (c) =>
                 `<button type="button" class="btn chip" data-cat="${c.nombre}" data-cat-id="${c.id || ''}" aria-pressed="${
                     c.nombre === filtros.categoria
-                }">${c.nombre ? `🎬 ${c.nombre}` : '🍿 Todas'}</button>`
+                }">${c.nombre || 'Todas'}</button>`
         )
         .join('');
     chips.addEventListener('click', (e) => {

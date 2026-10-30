@@ -25,12 +25,12 @@ const celdaTituloConPoster = (p) => {
     const thumb =
         p.imagen_url && String(p.imagen_url).startsWith('http')
             ? `<img src="${escapar(p.imagen_url)}" alt="" class="admin-thumb">`
-            : `<span class="admin-thumb-placeholder">🎬</span>`;
+            : `<span class="admin-thumb-placeholder">KF</span>`;
     return `<div class="celda-pelicula-info">
                 ${thumb}
                 <div>
                     <strong>${escapar(p.titulo)}</strong>
-                    ${p.director ? `<div class="muted" style="font-size:0.78rem;">🎥 ${escapar(p.director)}</div>` : ''}
+                    ${p.director ? `<div class="muted" style="font-size:0.78rem;">Dir. ${escapar(p.director)}</div>` : ''}
                 </div>
             </div>`;
 };
@@ -49,31 +49,31 @@ const pintar = () => {
     $('stat-categorias').textContent = datos.categorias.length;
 
     $('tabla-pendientes').innerHTML = tabla(
-        ['Película Propuesta', 'Tipo', 'Año', 'Categoría'],
+        ['Película propuesta', 'Tipo', 'Año', 'Categoría'],
         datos.pendientes.map((p) =>
             fila(
                 celdasPelicula(p),
-                boton('aprobar', p.id, '✓ Aprobar', 'btn-ok') +
-                    boton('rechazar', p.id, '✕ Rechazar', 'btn-peligro')
+                boton('aprobar', p.id, 'Aprobar', 'btn-ok') +
+                    boton('rechazar', p.id, 'Rechazar', 'btn-peligro')
             )
         ),
-        '🎉 No hay propuestas pendientes de moderación en este momento.'
+        'No hay propuestas pendientes de moderación en este momento.'
     );
 
     $('tabla-peliculas').innerHTML = tabla(
-        ['Título en Cartelera', 'Tipo', 'Año', 'Categoría', 'Calificación'],
+        ['Título en cartelera', 'Tipo', 'Año', 'Categoría', 'Calificación'],
         datos.peliculas.map((p) =>
             fila(
                 [...celdasPelicula(p), `<span class="score">★ ${Number(p.rating_promedio || 0).toFixed(1)}</span>`],
-                boton('editar-pelicula', p.id, '✏️ Editar') +
-                    boton('eliminar-pelicula', p.id, '🗑️ Eliminar', 'btn-peligro')
+                boton('editar-pelicula', p.id, 'Editar') +
+                    boton('eliminar-pelicula', p.id, 'Eliminar', 'btn-peligro')
             )
         ),
         'Aún no hay películas aprobadas en el catálogo.'
     );
 
     $('tabla-categorias').innerHTML = tabla(
-        ['Nombre de Categoría', 'Descripción', 'Títulos'],
+        ['Nombre de categoría', 'Descripción', 'Títulos'],
         datos.categorias.map((c) =>
             fila(
                 [
@@ -81,8 +81,8 @@ const pintar = () => {
                     escapar(c.descripcion || '—'),
                     `<span class="badge-tabla">${c.total_peliculas ?? 0}</span>`
                 ],
-                boton('editar-categoria', c.id, '✏️ Editar') +
-                    boton('eliminar-categoria', c.id, '🗑️ Eliminar', 'btn-peligro')
+                boton('editar-categoria', c.id, 'Editar') +
+                    boton('eliminar-categoria', c.id, 'Eliminar', 'btn-peligro')
             )
         ),
         'Aún no hay categorías registradas.'
@@ -152,7 +152,7 @@ const abrirCategoria = (categoria) => {
     const form = $('form-categoria');
     form.reset();
     form.dataset.id = categoria?.id ?? '';
-    $('titulo-dlg-categoria').textContent = categoria ? '✏️ Editar categoría' : '➕ Nueva categoría';
+    $('titulo-dlg-categoria').textContent = categoria ? 'Editar categoría' : 'Nueva categoría';
     $('error-categoria').textContent = '';
     if (categoria) {
         form.nombre.value = categoria.nombre;
@@ -165,7 +165,7 @@ const abrirPelicula = (pelicula) => {
     const form = $('form-pelicula');
     form.reset();
     form.dataset.id = pelicula?.id ?? '';
-    $('titulo-dlg-pelicula').textContent = pelicula ? '✏️ Editar película' : '🎬 Nueva película en cartelera';
+    $('titulo-dlg-pelicula').textContent = pelicula ? 'Editar película' : 'Nueva película en cartelera';
     $('error-pelicula').textContent = '';
     if (pelicula) {
         form.titulo.value = pelicula.titulo || '';
@@ -192,12 +192,11 @@ const guardar = async (form, ruta, cuerpo, idError, idDialogo) => {
     const id = form.dataset.id;
     try {
         const res = await (id ? api.put(`${ruta}/${id}`, cuerpo) : api.post(ruta, cuerpo));
-        // Si el admin creó una película nueva en el backend real (que inicia en 'pendiente'), aprobarla automáticamente
         if (!id && ruta === '/peliculas' && res?.datos?.id && res?.datos?.estado === 'pendiente') {
             await api.patch(`/peliculas/admin/${res.datos.id}/estado`, { estado: 'aprobada' }).catch(() => {});
         }
         $(idDialogo).close();
-        toast(id ? '✨ Cambios guardados correctamente' : '🎬 Registro creado con éxito');
+        toast(id ? 'Cambios guardados correctamente' : 'Registro creado con éxito');
         await cargarTodo();
     } catch (error) {
         $(idError).textContent = error.message;
@@ -279,7 +278,7 @@ const cambiarEstado = (id, estado, mensaje) =>
     ejecutar(() => api.patch(`/peliculas/admin/${id}/estado`, { estado }), mensaje);
 
 const acciones = {
-    aprobar: (id) => cambiarEstado(id, 'aprobada', '🎬 ¡Película aprobada y publicada en el catálogo!'),
+    aprobar: (id) => cambiarEstado(id, 'aprobada', 'Película aprobada y publicada en el catálogo'),
     rechazar: (id) =>
         confirmar('¿Rechazar esta propuesta?') && cambiarEstado(id, 'rechazada', 'Propuesta rechazada'),
     'nueva-pelicula': () => abrirPelicula(),
@@ -297,7 +296,7 @@ const acciones = {
 const iniciar = () => {
     if (!requireAdmin()) {
         $('contenido-admin').innerHTML = estadoVacio(
-            '🔒 Acceso restringido: Esta sección es exclusiva para cuentas con rol Administrador. Redirigiendo...'
+            'Acceso restringido: Esta sección es exclusiva para cuentas con rol Administrador. Redirigiendo...'
         );
         setTimeout(() => (location.href = '../index.html'), 1600);
         return;
@@ -309,11 +308,11 @@ const iniciar = () => {
         banner.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
                 <div>
-                    <p class="eyebrow">👑 Centro de Control y Moderación</p>
-                    <h2 style="margin:0.2rem 0;">Panel de Administración · Bienvenida, ${escapar(adminUser.nombre)}</h2>
-                    <p class="muted">Aprueba propuestas de la comunidad, publica estrenos con póster en vivo y administra categorías.</p>
+                    <p class="eyebrow">Panel de administración</p>
+                    <h2 style="margin:0.2rem 0;">Hola, ${escapar(adminUser.nombre)}</h2>
+                    <p class="muted">Gestiona categorías, películas en cartelera y propuestas enviadas por la comunidad.</p>
                 </div>
-                <span class="rol-badge rol-admin" style="font-size:0.85rem;padding:0.4rem 0.8rem;">🔐 Rol Verificado: ADMIN</span>
+                <span class="rol-badge rol-admin" style="font-size:0.78rem;padding:0.35rem 0.75rem;">Rol: Administrador</span>
             </div>
         `;
     }

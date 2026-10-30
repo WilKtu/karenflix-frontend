@@ -394,7 +394,7 @@ const rutasPeliculas = (db, metodo, partes, cuerpo) => {
         pelicula.estado = cuerpo.estado;
         guardarDB(db);
         agregarNotificacion({
-            titulo: cuerpo.estado === 'aprobada' ? '🎬 Película aprobada y en cartelera' : 'Propuesta rechazada',
+            titulo: cuerpo.estado === 'aprobada' ? 'Película aprobada y en cartelera' : 'Propuesta rechazada',
             mensaje: `"${pelicula.titulo}" cambió su estado a ${cuerpo.estado}.`,
             paraRol: 'todos',
             enlace: cuerpo.estado === 'aprobada' ? `pages/detalle.html?id=${pelicula.id}` : ''
@@ -439,14 +439,14 @@ const rutasPeliculas = (db, metodo, partes, cuerpo) => {
 
         if (estadoInicialPeli === 'pendiente') {
             agregarNotificacion({
-                titulo: '📥 Nueva propuesta de película recibida',
+                titulo: 'Nueva propuesta de película recibida',
                 mensaje: `${nueva.creado_por_nombre} propuso "${nueva.titulo}" para moderación.`,
                 paraRol: 'admin',
                 enlace: 'pages/admin.html'
             });
         } else {
             agregarNotificacion({
-                titulo: '✨ Nuevo estreno en KAREN-FLIX',
+                titulo: 'Nuevo estreno en KAREN-FLIX',
                 mensaje: `"${nueva.titulo}" (${nueva.anio}) ya está disponible en el catálogo.`,
                 paraRol: 'todos',
                 enlace: `pages/detalle.html?id=${nueva.id}`
@@ -549,7 +549,7 @@ export const demo = async (metodo, ruta, cuerpo) => {
         guardarDB(db);
 
         agregarNotificacion({
-            titulo: '🎉 ¡Cuenta creada con éxito!',
+            titulo: 'Cuenta creada con éxito',
             mensaje: `Hola ${nombre}, ya puedes calificar películas, publicar reseñas y proponer nuevos títulos.`,
             paraRol: 'todos',
             enlace: 'pages/catalogo.html'

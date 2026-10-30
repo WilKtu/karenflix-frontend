@@ -35,8 +35,8 @@ const htmlResena = (r) => {
     const esMia = puedeModificarResena(r);
     const controlesCrud = esMia
         ? `<div class="resena-crud">
-               <button class="btn btn-sm btn-editar-resena" type="button" data-editar="${r.id}">✏️ Editar</button>
-               <button class="btn btn-sm btn-peligro btn-eliminar-resena" type="button" data-eliminar="${r.id}">🗑️ Eliminar</button>
+               <button class="btn btn-sm btn-editar-resena" type="button" data-editar="${r.id}">Editar</button>
+               <button class="btn btn-sm btn-peligro btn-eliminar-resena" type="button" data-eliminar="${r.id}">Eliminar</button>
            </div>`
         : '';
 
@@ -53,8 +53,8 @@ const htmlResena = (r) => {
         <div class="resena-pie">
             <p class="muted">Por <strong>${escapar(r.autor)}</strong> · ${escapar(r.created_at)}</p>
             <div class="acciones-resena">
-                <button class="btn btn-sm reaccion" data-id="${r.id}" data-tipo="like" aria-pressed="${r.miReaccion === 'like'}">👍 ${r.likes}</button>
-                <button class="btn btn-sm reaccion" data-id="${r.id}" data-tipo="dislike" aria-pressed="${r.miReaccion === 'dislike'}">👎 ${r.dislikes}</button>
+                <button class="btn btn-sm reaccion" data-id="${r.id}" data-tipo="like" aria-pressed="${r.miReaccion === 'like'}">Útil (${r.likes})</button>
+                <button class="btn btn-sm reaccion" data-id="${r.id}" data-tipo="dislike" aria-pressed="${r.miReaccion === 'dislike'}">No útil (${r.dislikes})</button>
                 ${controlesCrud}
             </div>
         </div>
@@ -77,8 +77,8 @@ const configurarEstadoFormularioResena = () => {
     } else {
         bloqueLogin.hidden = true;
         formResena.hidden = false;
-        document.getElementById('autor-form-resena').textContent = `Publicando como ${usuario.nombre} (${
-            esAdmin() ? 'Administrador' : 'Miembro'
+        document.getElementById('autor-form-resena').textContent = `Sesión: ${usuario.nombre} (${
+            esAdmin() ? 'Admin' : 'Miembro'
         })`;
     }
 };
@@ -98,8 +98,8 @@ const pintar = () => {
     const bloqueTrailer = embedUrl
         ? `<div class="trailer-seccion" id="contenedor-trailer">
                <div class="trailer-cabecera">
-                   <h3>🎞️ Tráiler Oficial</h3>
-                   <button class="btn btn-sm" id="btn-modo-cine" type="button">💡 Modo Sala de Cine (Apagar luces)</button>
+                   <h3>Tráiler oficial</h3>
+                   <button class="btn btn-sm" id="btn-modo-cine" type="button">Modo sala de cine (apagar luces)</button>
                </div>
                <div class="trailer-marco">
                    <iframe src="${embedUrl}" title="Tráiler de ${escapar(pelicula.titulo)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -109,7 +109,7 @@ const pintar = () => {
 
     document.getElementById('info').innerHTML = `
         <div class="detalle-grid">
-            <div class="poster hero-poster ${tienePoster ? 'poster-real-detalle' : ''}" style="${posterStyle}" role="img" aria-label="Póster de ${escapar(pelicula.titulo)}">
+            <div class="poster poster-detalle" style="${posterStyle}" role="img" aria-label="Póster de ${escapar(pelicula.titulo)}">
                 ${!tienePoster ? escapar(pelicula.titulo) : ''}
             </div>
             <div class="detalle-info-col">
@@ -119,15 +119,15 @@ const pintar = () => {
                 </div>
                 <h1 class="titulo-cine-detalle">${escapar(pelicula.titulo)}</h1>
                 <p class="hero-meta">
-                    📅 Año: <strong>${pelicula.anio}</strong>
-                    ${pelicula.duracion_minutos ? ` · ⏱️ Duración: <strong>${pelicula.duracion_minutos} min</strong>` : ''}
-                    ${pelicula.director ? ` · 🎥 Director: <strong>${escapar(pelicula.director)}</strong>` : ''}
+                    Año: <strong>${pelicula.anio}</strong>
+                    ${pelicula.duracion_minutos ? ` · Duración: <strong>${pelicula.duracion_minutos} min</strong>` : ''}
+                    ${pelicula.director ? ` · Director: <strong>${escapar(pelicula.director)}</strong>` : ''}
                 </p>
                 <p class="detalle-sinopsis">${escapar(pelicula.descripcion)}</p>
                 ${
                     actoresLista.length
                         ? `<div class="reparto-box">
-                               <span class="muted">🎭 Reparto principal:</span>
+                               <span class="muted">Reparto principal:</span>
                                <div class="hero-chips">${actoresLista
                                    .map((a) => `<span class="actor-chip">${escapar(a)}</span>`)
                                    .join('')}</div>
@@ -144,22 +144,22 @@ const pintar = () => {
         cortina.hidden = activo;
         document.body.classList.toggle('sala-cine-activa', !activo);
         document.getElementById('btn-modo-cine').textContent = !activo
-            ? '☀️ Encender luces de sala'
-            : '💡 Modo Sala de Cine (Apagar luces)';
+            ? 'Encender luces de sala'
+            : 'Modo sala de cine (apagar luces)';
     });
 
     document.getElementById('cortina-cine')?.addEventListener('click', () => {
         document.getElementById('cortina-cine').hidden = true;
         document.body.classList.remove('sala-cine-activa');
         const btn = document.getElementById('btn-modo-cine');
-        if (btn) btn.textContent = '💡 Modo Sala de Cine (Apagar luces)';
+        if (btn) btn.textContent = 'Modo sala de cine (apagar luces)';
     });
 
     configurarEstadoFormularioResena();
 
     document.getElementById('resenas').innerHTML =
         pelicula.resenas.map(htmlResena).join('') ||
-        estadoVacio('Aún no hay reseñas para esta producción. ¡Sé la primera persona en compartir tu crítica!');
+        estadoVacio('Aún no hay reseñas para esta producción. Sé la primera persona en compartir tu crítica.');
 };
 
 const cargar = async () => {
@@ -179,7 +179,7 @@ const cancelarEdicion = () => {
     const form = document.getElementById('form-resena');
     form.reset();
     document.getElementById('resena-edit-id').value = '';
-    document.getElementById('titulo-form-resena').textContent = '✍️ Escribe tu reseña';
+    document.getElementById('titulo-form-resena').textContent = 'Escribe tu reseña';
     document.getElementById('btn-submit-resena').textContent = 'Publicar reseña';
     document.getElementById('btn-cancelar-edicion').hidden = true;
     document.getElementById('contador').textContent = '0/500';
@@ -226,8 +226,8 @@ document.getElementById('resenas').addEventListener('click', async (e) => {
             return btnActivo ? Number(btnActivo.dataset.nota) : r.calificacion;
         };
 
-        document.getElementById('titulo-form-resena').textContent = '✏️ Editando tu reseña';
-        document.getElementById('btn-submit-resena').textContent = 'Guardar cambios en reseña';
+        document.getElementById('titulo-form-resena').textContent = 'Editando tu reseña';
+        document.getElementById('btn-submit-resena').textContent = 'Guardar cambios';
         document.getElementById('btn-cancelar-edicion').hidden = false;
         document.getElementById('form-resena').scrollIntoView({ behavior: 'smooth' });
         return;
@@ -282,10 +282,10 @@ document.getElementById('form-resena').addEventListener('submit', async (e) => {
     try {
         if (editId) {
             await api.put(`/resenas/${editId}`, { titulo, comentario: texto, calificacion });
-            toast('✨ ¡Tu reseña fue actualizada!');
+            toast('Reseña actualizada');
         } else {
             await api.post(`/peliculas/${id}/resenas`, { titulo, comentario: texto, calificacion });
-            toast('🍿 ¡Reseña publicada con éxito!');
+            toast('Reseña publicada con éxito');
         }
         cancelarEdicion();
         await cargar();
