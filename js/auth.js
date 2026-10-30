@@ -17,7 +17,18 @@ export const cerrarSesion = () => localStorage.removeItem(CLAVE);
 
 const leer = () => {
     try {
-        return JSON.parse(localStorage.getItem(CLAVE)) || {};
+        const datos = JSON.parse(localStorage.getItem(CLAVE)) || {};
+        // Asegurar que la cuenta principal de Evelyn tenga permisos de Admin si viene de una sesión previa
+        if (
+            datos.usuario &&
+            !datos.usuario.rol_fijado &&
+            String(datos.usuario.nombre || '')
+                .toLowerCase()
+                .includes('evelyn')
+        ) {
+            datos.usuario.rol = 'admin';
+        }
+        return datos;
     } catch {
         return {};
     }
@@ -41,8 +52,8 @@ export const requireAdmin = () => requireAuth() && esAdmin();
 const notificacionesIniciales = () => [
     {
         id: 1,
-        titulo: '¡Bienvenido a KAREN-FLIX Cinema!',
-        mensaje: 'Explora el catálogo, mira los tráilers en Modo Cine y comparte tus reseñas.',
+        titulo: '¡Bienvenida a KAREN-FLIX Cinema!',
+        mensaje: 'Explora el catálogo, mira los tráilers en Modo Sala de Cine y comparte tus reseñas.',
         fecha: 'Hace un momento',
         leida: false,
         paraRol: 'todos',

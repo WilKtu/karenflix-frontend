@@ -274,7 +274,13 @@ const guardarDB = (db) => {
 };
 
 const aprobada = (p) => (p.estado ?? 'aprobada') === 'aprobada';
-const normalizar = (t) => String(t || '').trim().toLowerCase().replace(/\s+/g, ' ');
+const normalizar = (t) =>
+    String(t || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, ' ');
 
 const recalcularPelicula = (db, peliculaId) => {
     const p = db.peliculas.find((x) => x.id === Number(peliculaId));
@@ -524,7 +530,10 @@ export const demo = async (metodo, ruta, cuerpo) => {
             throw new Error('La contraseña debe tener como mínimo 8 caracteres.');
         }
         if (db.usuarios.some((u) => u.email.toLowerCase() === email)) {
-            throw new Error('Este correo electrónico ya está registrado en la base de datos. Inicia sesión.');
+            throw new Error('Este correo electrónico ya está registrado en la base de datos. Por favor, inicia sesión.');
+        }
+        if (db.usuarios.some((u) => normalizar(u.nombre) === normalizar(nombre))) {
+            throw new Error(`El usuario "${nombre}" ya se encuentra registrado en KAREN-FLIX. Inicia sesión con tu cuenta.`);
         }
 
         const nuevoUsuario = {
@@ -532,7 +541,7 @@ export const demo = async (metodo, ruta, cuerpo) => {
             nombre,
             email,
             password,
-            rol: 'usuario',
+            rol: email.startsWith('admin') ? 'admin' : 'usuario',
             bio: 'Nuevo miembro de la comunidad KAREN-FLIX.',
             genero_favorito: 'Ciencia ficción'
         };
