@@ -1,0 +1,30 @@
+/* Panel de administración: layout con menú lateral, distinto al sitio público */
+.admin-banner { margin-top: 1.5rem; padding: 1rem 1.25rem; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: var(--radius); }
+.admin { display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; padding-block: 1.5rem 3rem; align-items: start; }
+.admin-menu { display: grid; gap: 0.5rem; position: sticky; top: 5rem; }
+.admin-menu .btn { display: flex; justify-content: space-between; align-items: center; text-align: left; }
+.admin-menu .btn[aria-selected="true"] { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.contador { background: rgb(0 0 0 / 0.25); border-radius: 999px; padding: 0 0.6rem; font-size: 0.8rem; }
+.admin-cabecera { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.admin-cabecera .titulo-seccion { margin-bottom: 0; }
+
+.tabla-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; min-width: 560px; }
+th, td { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--surface-2); }
+.acciones-fila { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+.btn-sm { padding: 0.3rem 0.7rem; font-size: 0.85rem; }
+.btn-ok { border-color: var(--ok); color: var(--ok); }
+.btn-peligro { border-color: var(--danger); color: var(--danger); }
+
+dialog { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; width: min(480px, 92vw); margin: auto; }
+dialog::backdrop { background: rgb(0 0 0 / 0.6); }
+dialog h2 { margin-bottom: 1rem; }
+
+@media (max-width: 800px) {
+    .admin { grid-template-columns: 1fr; }
+    .admin-menu { grid-auto-flow: column; position: static; overflow-x: auto; }
+}
