@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Acceso · KAREN-FLIX</title>
+    <link rel="stylesheet" href="../css/variables.css"><link rel="stylesheet" href="../css/base.css"><link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+    <div id="navbar"></div>
+    <main class="contenedor"><div class="caja caja-auth">
+        <div class="pestanas" role="tablist">
+            <button class="btn" type="button" role="tab" data-modo="login">Iniciar sesión</button>
+            <button class="btn" type="button" role="tab" data-modo="registro">Registrarse</button>
+        </div>
+        <form id="form-login" novalidate>
+            <div class="campo"><label for="l-email">Correo</label><input id="l-email" name="email" type="email" placeholder="tu@correo.com" autocomplete="email"></div>
+            <div class="campo"><label for="l-pass">Contraseña</label><input id="l-pass" name="password" type="password" autocomplete="current-password"></div>
+            <p class="error-campo" role="alert"></p>
+            <button class="btn btn-primario" type="submit">Entrar</button>
+        </form>
+        <form id="form-registro" novalidate hidden>
+            <div class="campo"><label for="r-nombre">Nombre</label><input id="r-nombre" name="nombre" autocomplete="name"></div>
+            <div class="campo"><label for="r-email">Correo</label><input id="r-email" name="email" type="email" autocomplete="email"></div>
+            <div class="campo"><label for="r-pass">Contraseña (mín. 8)</label><input id="r-pass" name="password" type="password" autocomplete="new-password"></div>
+            <div class="campo"><label for="r-conf">Confirmar contraseña</label><input id="r-conf" name="confirmar" type="password" autocomplete="new-password"></div>
+            <p class="error-campo" role="alert"></p>
+            <button class="btn btn-primario" type="submit">Crear cuenta</button>
+        </form>
+    </div></main>
+    <script type="module" src="../js/pages/login.js"></script>
+</body>
+</html>

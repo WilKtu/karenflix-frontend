@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Detalle · KAREN-FLIX</title>
+    <link rel="stylesheet" href="../css/variables.css"><link rel="stylesheet" href="../css/base.css"><link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+    <div id="navbar"></div>
+    <main class="contenedor seccion">
+        <div id="info"><p class="muted">Cargando...</p></div>
+        <section class="seccion">
+            <p class="eyebrow">Comunidad</p><h2 class="titulo-seccion">Reseñas</h2>
+            <form class="caja" id="form-resena" novalidate>
+                <div class="campo"><label for="titulo">Título de tu reseña</label><input id="titulo" maxlength="80"></div>
+                <div class="campo"><label>Calificación</label><div id="selector-nota"></div></div>
+                <div class="campo"><label for="comentario">Reseña</label><textarea id="comentario" rows="3" maxlength="500" placeholder="Comparte tu opinión (máximo 500 caracteres)"></textarea><span class="muted" id="contador">0/500</span></div>
+                <p class="error-campo" id="error-resena" role="alert"></p>
+                <button class="btn btn-primario" type="submit">Publicar reseña</button>
+            </form>
+            <div id="resenas" style="margin-top:1.5rem"></div>
+        </section>
+    </main>
+    <footer class="footer"><div class="contenedor footer-grid">
+        <div><a class="logo" href="../index.html">KAREN<span>-FLIX</span></a><p>Descubre nuevas historias, películas y universos por explorar</p></div>
+        <nav aria-label="Pie"><a href="../index.html">Inicio</a> · <a href="../pages/catalogo.html">Catálogo</a></nav>
+    </div></footer>
+    <script type="module" src="../js/pages/detalle.js"></script>
+</body>
+</html>
