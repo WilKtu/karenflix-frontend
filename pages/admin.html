@@ -214,6 +214,22 @@
             </div>
         </form>
     </dialog>
+    <!-- Modal de Aprobación de Propuestas -->
+    <dialog id="dlg-aprobar" aria-labelledby="titulo-dlg-aprobar">
+        <form id="form-aprobar" novalidate>
+            <h2 id="titulo-dlg-aprobar">Aprobar película propuesta</h2>
+            <p class="muted" id="subtitulo-dlg-aprobar">Ingresa o valida el enlace para ver en Cuevana antes de publicarla.</p>
+            <div class="campo">
+                <label for="ap-cuevana">Enlace de Cuevana (opcional)</label>
+                <input id="ap-cuevana" name="cuevana_url" type="url" placeholder="https://cuevana... (dejar vacío si no está disponible)">
+            </div>
+            <p class="error-campo" id="error-aprobar" role="alert"></p>
+            <div class="acciones">
+                <button class="btn btn-ok" type="submit">Aprobar y Notificar</button>
+                <button class="btn" type="button" data-cerrar="dlg-aprobar">Cancelar</button>
+            </div>
+        </form>
+    </dialog>
 
     <!-- Scripts -->
     <script type="module" src="../js/pages/admin.js"></script>
