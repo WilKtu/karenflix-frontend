@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Acceso · KAREN-FLIX</title>
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/componets.css">
+</head>
+<body>
+    <div id="navbar"></div>
+    <main class="contenedor">
+        <div class="caja caja-auth" id="caja-auth">
+            <div class="auth-header">
+                <p class="eyebrow">Acceso a tu cuenta</p>
+                <h1 class="titulo-auth">KAREN<span>-FLIX</span></h1>
+                <p class="muted" style="font-size:0.88rem;">Inicia sesión o regístrate para publicar reseñas, guardar favoritos y proponer títulos.</p>
+            </div>
+
+            <div class="pestanas" role="tablist">
+                <button class="btn" type="button" role="tab" data-modo="login">Iniciar sesión</button>
+                <button class="btn" type="button" role="tab" data-modo="registro">Registrarse</button>
+            </div>
+
+            <form id="form-login" novalidate>
+                <div class="campo">
+                    <label for="l-email">Correo electrónico *</label>
+                    <input id="l-email" name="email" type="email" placeholder="nombre@correo.com" autocomplete="email" required>
+                    <small class="hint-campo" id="hint-l-email"></small>
+                </div>
+                <div class="campo">
+                    <label for="l-pass">Contraseña *</label>
+                    <div class="input-pass-wrap">
+                        <input id="l-pass" name="password" type="password" placeholder="Ingresa tu contraseña" autocomplete="current-password" required>
+                        <button class="btn-ojito" type="button" data-toggle-pass="l-pass" aria-label="Mostrar u ocultar contraseña">Ver</button>
+                    </div>
+                </div>
+                <div class="alerta-error-box" id="alerta-login" hidden>
+                    <p class="error-campo" id="error-login-txt" role="alert"></p>
+                </div>
+                <button class="btn btn-primario btn-full" type="submit">Iniciar sesión</button>
+            </form>
+
+            <form id="form-registro" novalidate hidden>
+                <div class="campo">
+                    <label for="r-nombre">Nombre completo *</label>
+                    <input id="r-nombre" name="nombre" placeholder="Tu nombre y apellido" autocomplete="name" required>
+                </div>
+                <div class="campo">
+                    <label for="r-email">Correo electrónico *</label>
+                    <input id="r-email" name="email" type="email" placeholder="tu@correo.com" autocomplete="email" required>
+                </div>
+                <div class="campo">
+                    <label for="r-pass">Contraseña (mínimo 8 caracteres) *</label>
+                    <div class="input-pass-wrap">
+                        <input id="r-pass" name="password" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" required>
+                        <button class="btn-ojito" type="button" data-toggle-pass="r-pass" aria-label="Mostrar u ocultar contraseña">Ver</button>
+                    </div>
+                </div>
+                <div class="campo">
+                    <label for="r-conf">Confirmar contraseña *</label>
+                    <input id="r-conf" name="confirmar" type="password" placeholder="Repite tu contraseña" autocomplete="new-password" required>
+                </div>
+                <div class="alerta-error-box" id="alerta-registro" hidden>
+                    <p class="error-campo" id="error-registro-txt" role="alert"></p>
+                </div>
+                <button class="btn btn-primario btn-full" type="submit">Crear cuenta</button>
+            </form>
+        </div>
+    </main>
+    <script type="module" src="../js/pages/login.js"></script>
+</body>
+</html>

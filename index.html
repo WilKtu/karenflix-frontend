@@ -1,77 +1,105 @@
-<!doctype html>
-<html lang="es">
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Prototipo de plataforma de contenido audiovisual.">
-  <title>KAREN-FLIX — Explora contenido</title>
-  <link rel="stylesheet" href="./css/variables.css">
-  <link rel="stylesheet" href="./css/base.css">
-  <link rel="stylesheet" href="./css/components.css">
-  <script type="module" src="./js/ui.js"></script>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>KAREN-FLIX</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/componets.css">
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="#" aria-label="Nébula, inicio">KAREN-FLIX<span>+</span></a>
-    <nav class="nav" aria-label="Navegación principal">
-      <a class="nav__link nav__link--active" href="#inicio">Inicio</a>
-      <a class="nav__link" href="#populares">Populares</a>
-      <a class="nav__link" href="#catalogo">Catálogo</a>
-    </nav>
-    <form class="search" id="search-form" role="search">
-      <label class="sr-only" for="search-input">Buscar contenido</label>
-      <input id="search-input" type="search" placeholder="Buscar títulos..." autocomplete="off">
-      <button class="button button--subtle" type="submit">Buscar</button>
-    </form>
-  </header>
+    <div id="navbar"></div>
+    <main>
+        <section class="hero">
+            <div class="contenedor hero-grid">
+                <div id="hero-contenido"><p class="muted">Cargando...</p></div>
 
-  <main id="inicio">
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero__content">
-        <p class="eyebrow">RECOMENDACIÓN DE LA SEMANA</p>
-        <h1 id="hero-title">Más historias.<br>Otros universos.</h1>
-        <p class="hero__description">Explora historias, documentales y aventuras seleccionadas para ti.</p>
-        <div class="hero__actions">
-          <a class="button button--primary" href="#catalogo">Explorar catálogo</a>
-          <a class="button button--outline" href="#populares">Ver populares</a>
-        </div>
-      </div>
-      <div class="hero__art" aria-hidden="true">
-        <div class="orb orb--one"></div><div class="orb orb--two"></div>
-        <div class="hero__poster"><span>KAREN-FLIX</span><strong>ODISEA<br>ESTELAR</strong><small>UNA HISTORIA ORIGINAL</small></div>
-      </div>
-    </section>
+                <div class="hero-escena-cine">
+                    <!-- Elementos de cine animados minimalistas (cinta, claqueta, carrete y palomitas) -->
+                    <div class="cine-badge-flotante cine-flota-1" aria-hidden="true" title="Rodaje y dirección">
+                        <svg class="svg-cine svg-claqueta" viewBox="0 0 64 64" fill="none">
+                            <g class="claqueta-tapa">
+                                <rect x="8" y="10" width="48" height="10" rx="2" fill="var(--accent)" />
+                                <path d="M16 10L22 20M30 10L36 20M44 10L50 20" stroke="var(--bg)" stroke-width="3" stroke-linecap="round"/>
+                            </g>
+                            <rect x="8" y="22" width="48" height="32" rx="4" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2"/>
+                            <line x1="16" y1="32" x2="48" y2="32" stroke="var(--accent-ice)" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="16" y1="42" x2="36" y2="42" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <span>35mm · Selección Oficial</span>
+                    </div>
 
-    <section class="section" id="populares" aria-labelledby="popular-title">
-      <div class="section__heading">
-        <div><p class="eyebrow">LO MÁS VISTO</p><h2 id="popular-title">Populares ahora</h2></div>
-        <span class="section__hint">Selección de prueba</span>
-      </div>
-      <div class="card-grid" id="popular-list" aria-live="polite"></div>
-    </section>
+                    <div class="poster hero-poster" id="hero-poster" style="--h:205" role="img" aria-label="Póster destacado"></div>
 
-    <section class="section" id="catalogo" aria-labelledby="catalog-title">
-      <div class="section__heading">
-        <div><p class="eyebrow">DESCUBRE ALGO NUEVO</p><h2 id="catalog-title">Explora el catálogo</h2></div>
-        <label class="filter-label" for="genre-filter">Género
-          <select id="genre-filter">
-            <option value="todos">Todos</option>
-            <option value="Ciencia ficción">Ciencia ficción</option>
-            <option value="Documental">Documental</option>
-            <option value="Drama">Drama</option>
-            <option value="Aventura">Aventura</option>
-            <option value="Animación">Animación</option>
-          </select>
-        </label>
-      </div>
-      <div class="card-grid" id="catalog-list" aria-live="polite"></div>
-      <p class="empty-state" id="empty-state" hidden>No se encontraron títulos con esos criterios.</p>
-    </section>
-  </main>
+                    <div class="cine-badge-flotante cine-flota-2" aria-hidden="true" title="Sala de cine">
+                        <svg class="svg-cine" viewBox="0 0 64 64" fill="none">
+                            <!-- Palomitas flotantes -->
+                            <circle class="pop-grano pop-1" cx="22" cy="16" r="5" fill="var(--accent-ice)"/>
+                            <circle class="pop-grano pop-2" cx="32" cy="13" r="6" fill="var(--accent)"/>
+                            <circle class="pop-grano pop-3" cx="42" cy="16" r="5" fill="var(--accent-ice)"/>
+                            <circle cx="27" cy="20" r="5" fill="var(--text)"/>
+                            <circle cx="37" cy="20" r="5" fill="var(--text)"/>
+                            <!-- Caja de palomitas -->
+                            <path d="M18 22H46L42 54H22L18 22Z" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>
+                            <line x1="26" y1="22" x2="27" y2="54" stroke="var(--accent-2)" stroke-width="2.5"/>
+                            <line x1="32" y1="22" x2="32" y2="54" stroke="var(--accent)" stroke-width="2.5"/>
+                            <line x1="38" y1="22" x2="37" y2="54" stroke="var(--accent-2)" stroke-width="2.5"/>
+                        </svg>
+                        <span>Función continua</span>
+                    </div>
 
-  <footer class="footer">
-    <a class="brand brand--small" href="#inicio">KAREN-FLIX<span>+</span></a>
-    <p>Prototipo académico · Datos sintéticos para pruebas · No es un servicio real.</p>
-  </footer>
+                    <!-- Carrete giratorio y tira de clips en movimiento -->
+                    <div class="cine-tira-movimiento" aria-hidden="true">
+                        <svg class="svg-carrete" viewBox="0 0 48 48" fill="none">
+                            <circle cx="24" cy="24" r="20" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 2"/>
+                            <circle cx="24" cy="24" r="5" fill="var(--accent-2)"/>
+                            <circle cx="24" cy="12" r="3.5" fill="var(--accent-ice)"/>
+                            <circle cx="24" cy="36" r="3.5" fill="var(--accent-ice)"/>
+                            <circle cx="12" cy="24" r="3.5" fill="var(--accent-ice)"/>
+                            <circle cx="36" cy="24" r="3.5" fill="var(--accent-ice)"/>
+                        </svg>
+                        <div class="film-strip-track">
+                            <div class="film-strip-inner">
+                                <span>CLIP 01</span><span>CLIP 02</span><span>CLIP 03</span><span>CLIP 04</span>
+                                <span>CLIP 01</span><span>CLIP 02</span><span>CLIP 03</span><span>CLIP 04</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="seccion contenedor" id="populares">
+            <p class="eyebrow">Lo más visto</p>
+            <h2 class="titulo-seccion">Populares ahora</h2>
+            <div class="grid-tarjetas" id="populares-lista"></div>
+        </section>
+
+        <section class="seccion contenedor">
+            <h2 class="titulo-seccion">Top 10</h2>
+            <div class="acciones">
+                <button class="btn" data-scroll="-1" aria-label="Anterior">←</button>
+                <button class="btn" data-scroll="1" aria-label="Siguiente">→</button>
+            </div>
+            <div class="carrusel" id="top10"></div>
+        </section>
+
+        <div class="contenedor" id="categorias"></div>
+
+        <section class="seccion contenedor">
+            <div class="caja">
+                <h2 class="titulo-seccion">Únete a KAREN-FLIX</h2>
+                <p class="muted">Califica, reseña y vota tus producciones favoritas.</p>
+                <div class="acciones">
+                    <a class="btn btn-primario" href="pages/login.html?modo=registro">Registrarse</a>
+                    <a class="btn" href="pages/login.html">Iniciar sesión</a>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="footer"><div class="contenedor footer-grid">
+        <div><a class="logo" href="index.html">KAREN<span>-FLIX</span></a><p>Descubre nuevas historias, películas y universos por explorar</p></div>
+        <nav aria-label="Pie"><a href="index.html">Inicio</a> · <a href="pages/catalogo.html">Catálogo</a></nav>
+    </div></footer>
+    <script type="module" src="js/pages/inicio.js"></script>
 </body>
 </html>

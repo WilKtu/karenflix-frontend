@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Catálogo · KAREN-FLIX</title>
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/componets.css">
+</head>
+<body>
+    <div id="navbar"></div>
+    <main class="contenedor seccion">
+        <div class="catalogo-cabecera">
+            <div>
+                <p class="eyebrow" id="catalogo-eyebrow">Explora</p>
+                <h1 class="titulo-seccion" id="catalogo-titulo">Catálogo</h1>
+            </div>
+            <button class="btn btn-sm" id="btn-limpiar-filtros" type="button" hidden>Ver todo el catálogo</button>
+        </div>
+
+        <div class="filtros filtros-limpios">
+            <input type="search" id="q" placeholder="Buscar por título, director o actor..." aria-label="Buscar">
+            <select id="categoria-select" aria-label="Seleccionar categoría">
+                <option value="">Todas las categorías</option>
+            </select>
+            <select id="tipo" aria-label="Tipo">
+                <option value="">Todos los formatos</option>
+                <option value="pelicula">Películas</option>
+                <option value="serie">Series</option>
+                <option value="anime">Anime</option>
+                <option value="documental">Documentales</option>
+            </select>
+            <select id="orden" aria-label="Ordenar">
+                <option value="ranking">Ordenar: Top Ranking</option>
+                <option value="popularidad">Ordenar: Más populares (Likes)</option>
+                <option value="recientes">Ordenar: Más recientes</option>
+            </select>
+        </div>
+
+        <div class="grid-tarjetas" id="lista" style="margin-top:1.5rem;"></div>
+        <div class="acciones"><button class="btn" id="mas" type="button" hidden>Cargar más</button></div>
+    </main>
+    <footer class="footer"><div class="contenedor footer-grid">
+        <div><a class="logo" href="../index.html">KAREN<span>-FLIX</span></a><p>Descubre nuevas historias, películas y universos por explorar</p></div>
+        <nav aria-label="Pie"><a href="../index.html">Inicio</a> · <a href="../pages/catalogo.html">Catálogo</a></nav>
+    </div></footer>
+    <script type="module" src="../js/pages/catalogo.js"></script>
+</body>
+</html>

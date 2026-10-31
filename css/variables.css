@@ -1,37 +1,34 @@
 :root {
-  /* Colores principales */
-  --color-bg: #080b14;
-  --color-surface: #111827;
-  --color-surface-raised: #192235;
-  --color-text: #f5f7fb;
-  --color-text-muted: #a6b0c3;
-  --color-primary: #8b5cf6;
-  --color-primary-hover: #a78bfa;
-  --color-accent: #22d3ee;
-  --color-border: rgba(255, 255, 255, 0.1);
-  --color-success: #34d399;
+  --bg: #070d19;
+  --surface: #0e1729;
+  --surface-2: #162238;
+  --text: #eff6ff;
+  --muted: #8da2c0;
+  --accent: #7dd3fc;
+  --accent-2: #3b82f6;
+  --accent-ice: #bae6fd;
+  --accent-text: #061320;
+  --border: #1e304c;
+  --danger: #f87171;
+  --ok: #38bdf8;
+  --radius: 14px;
+  --espacio: 1rem;
+  --fuente: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
 
-  /* Diseño */
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 22px;
-  --container-width: 1180px;
-  --header-height: 76px;
-  --shadow-card: 0 18px 40px rgba(0, 0, 0, 0.24);
-
-  /* Espaciado */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --space-6: 32px;
-  --space-7: 48px;
-
-  /* Tipografía */
-  --font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.25rem;
-  --text-xl: clamp(1.8rem, 4vw, 3.6rem);
+[data-theme="light"] {
+  --bg: #f0f6fc;
+  --surface: #ffffff;
+  --surface-2: #e2edf8;
+  --text: #0c192c;
+  --muted: #4b6382;
+  --accent: #0284c7;
+  --accent-2: #2563eb;
+  --accent-ice: #0369a1;
+  --accent-text: #ffffff;
+  --border: #c5d7ec;
+  --danger: #dc2626;
+  --ok: #0284c7;
+  color-scheme: light;
 }
