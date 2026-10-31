@@ -9,15 +9,34 @@
 <body>
     <div id="navbar"></div>
     <main class="contenedor seccion">
-        <p class="eyebrow">Explora</p><h1 class="titulo-seccion">Catálogo</h1>
-        <div class="filtros">
-            <input type="search" id="q" placeholder="Buscar títulos..." aria-label="Buscar">
-            <select id="tipo" aria-label="Tipo"><option value="">Todo tipo</option><option value="pelicula">Película</option><option value="serie">Serie</option><option value="anime">Anime</option><option value="documental">Documental</option></select>
-            <input type="number" id="anio" placeholder="Año" min="1900" max="2100" aria-label="Año">
-            <select id="orden" aria-label="Ordenar"><option value="ranking">Ranking</option><option value="popularidad">Popularidad</option><option value="recientes">Recientes</option></select>
+        <div class="catalogo-cabecera">
+            <div>
+                <p class="eyebrow" id="catalogo-eyebrow">Explora</p>
+                <h1 class="titulo-seccion" id="catalogo-titulo">Catálogo</h1>
+            </div>
+            <button class="btn btn-sm" id="btn-limpiar-filtros" type="button" hidden>Ver todo el catálogo</button>
         </div>
-        <div class="chips" id="chips"></div>
-        <div class="grid-tarjetas" id="lista"></div>
+
+        <div class="filtros filtros-limpios">
+            <input type="search" id="q" placeholder="Buscar por título, director o actor..." aria-label="Buscar">
+            <select id="categoria-select" aria-label="Seleccionar categoría">
+                <option value="">Todas las categorías</option>
+            </select>
+            <select id="tipo" aria-label="Tipo">
+                <option value="">Todos los formatos</option>
+                <option value="pelicula">Películas</option>
+                <option value="serie">Series</option>
+                <option value="anime">Anime</option>
+                <option value="documental">Documentales</option>
+            </select>
+            <select id="orden" aria-label="Ordenar">
+                <option value="ranking">Ordenar: Top Ranking</option>
+                <option value="popularidad">Ordenar: Más populares (Likes)</option>
+                <option value="recientes">Ordenar: Más recientes</option>
+            </select>
+        </div>
+
+        <div class="grid-tarjetas" id="lista" style="margin-top:1.5rem;"></div>
         <div class="acciones"><button class="btn" id="mas" type="button" hidden>Cargar más</button></div>
     </main>
     <footer class="footer"><div class="contenedor footer-grid">
