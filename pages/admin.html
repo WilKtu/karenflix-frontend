@@ -68,10 +68,21 @@
             <div class="campo"><label for="p-titulo">Título</label><input id="p-titulo" name="titulo" maxlength="120"></div>
             <div class="campo"><label for="p-desc">Descripción</label><textarea id="p-desc" name="descripcion" rows="3"></textarea></div>
             <div class="campo"><label for="p-tipo">Tipo</label>
-                <select id="p-tipo" name="tipo"><option value="pelicula">Película</option><option value="serie">Serie</option><option value="anime">Anime</option><option value="documental">Documental</option></select>
+            <select id="p-tipo" name="tipo">
+                <option value="pelicula">Película</option>
+                <option value="serie">Serie</option>
+                <option value="anime">Anime</option>
+                <option value="documental">Documental</option>
+            </select>
             </div>
             <div class="campo"><label for="p-anio">Año</label><input id="p-anio" name="anio" type="number" min="1900" max="2100"></div>
             <div class="campo"><label for="p-categoria">Categoría</label><select id="p-categoria" name="categoria_id"></select></div>
+
+            <div class="campo">
+                <label for="p-cuevana">Enlace para ver en Cuevana (opcional)</label>
+                <input id="p-cuevana" name="cuevana_url" type="url" placeholder="https://cuevana.biz/pelicula/...">
+            </div>
+
             <p class="error-campo" id="error-pelicula" role="alert"></p>
             <div class="acciones">
                 <button class="btn btn-primario" type="submit">Guardar</button>
