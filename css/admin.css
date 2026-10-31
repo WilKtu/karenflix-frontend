@@ -1,30 +1,80 @@
-/* Panel de administración: layout con menú lateral, distinto al sitio público */
-.admin-banner { margin-top: 1.5rem; padding: 1rem 1.25rem; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: var(--radius); }
-.admin { display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; padding-block: 1.5rem 3rem; align-items: start; }
-.admin-menu { display: grid; gap: 0.5rem; position: sticky; top: 5rem; }
+/* Panel de administración: layout con menú lateral en gama celeste y azul cobalto */
+.admin-banner {
+    margin-top: 1.5rem;
+    padding: 1.15rem 1.4rem;
+    background: linear-gradient(135deg, var(--surface), var(--surface-2));
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+}
+.admin { display: grid; grid-template-columns: 230px 1fr; gap: 1.5rem; padding-block: 1.5rem 3rem; align-items: start; }
+.admin-menu { display: grid; gap: 0.55rem; position: sticky; top: 5rem; }
 .admin-menu .btn { display: flex; justify-content: space-between; align-items: center; text-align: left; }
-.admin-menu .btn[aria-selected="true"] { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
-.contador { background: rgb(0 0 0 / 0.25); border-radius: 999px; padding: 0 0.6rem; font-size: 0.8rem; }
+.admin-menu .btn[aria-selected="true"] {
+    background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, var(--accent-2)));
+    color: var(--accent-text);
+    border-color: var(--accent);
+}
+.contador { background: rgb(0 0 0 / 0.25); border-radius: 999px; padding: 0.05rem 0.6rem; font-size: 0.78rem; font-weight: 700; }
 .admin-cabecera { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
 .admin-cabecera .titulo-seccion { margin-bottom: 0; }
 
 .tabla-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
-table { width: 100%; border-collapse: collapse; min-width: 560px; }
-th, td { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
-th { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; }
+table { width: 100%; border-collapse: collapse; min-width: 600px; }
+th, td { text-align: left; padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+th { color: var(--muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.06em; background: var(--surface-2); }
 tbody tr:last-child td { border-bottom: 0; }
-tbody tr:hover { background: var(--surface-2); }
+tbody tr:hover { background: color-mix(in srgb, var(--surface-2) 70%, transparent); }
 .acciones-fila { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
-.btn-sm { padding: 0.3rem 0.7rem; font-size: 0.85rem; }
-.btn-ok { border-color: var(--ok); color: var(--ok); }
-.btn-peligro { border-color: var(--danger); color: var(--danger); }
+.celda-pelicula-info { display: flex; align-items: center; gap: 0.75rem; }
+.admin-thumb { width: 40px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); flex-shrink: 0; }
+.admin-thumb-placeholder { width: 40px; height: 56px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--border); display: inline-grid; place-items: center; font-size: 0.75rem; font-weight: 700; color: var(--accent); flex-shrink: 0; }
+.badge-tabla { background: var(--surface-2); border: 1px solid var(--border); padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.75rem; text-transform: capitalize; }
 
-dialog { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; width: min(480px, 92vw); margin: auto; }
-dialog::backdrop { background: rgb(0 0 0 / 0.6); }
+.btn-sm { padding: 0.32rem 0.72rem; font-size: 0.83rem; }
+.btn-ok { border-color: var(--accent); color: var(--accent); }
+.btn-ok:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.btn-peligro { border-color: var(--danger); color: var(--danger); }
+.btn-peligro:hover { background: color-mix(in srgb, var(--danger) 14%, transparent); }
+
+dialog { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-top: 3px solid var(--accent); border-radius: var(--radius); padding: 1.5rem; width: min(520px, 94vw); max-height: 90vh; overflow-y: auto; margin: auto; box-shadow: 0 24px 60px rgb(0 0 0 / 0.7); }
+dialog::backdrop { background: rgb(0 0 0 / 0.7); backdrop-filter: blur(4px); }
 dialog h2 { margin-bottom: 1rem; }
 
+.grid-form-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+/* HU-17: Contenedor de previsualización en vivo del póster */
+.poster-preview-wrap { margin-bottom: 1rem; }
+.preview-label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.35rem; }
+.poster-preview-box {
+    width: 135px;
+    height: 195px;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-2);
+    overflow: hidden;
+    position: relative;
+    text-align: center;
+    padding: 0.5rem;
+}
+.poster-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: calc(var(--radius) - 2px);
+}
+.poster-placeholder {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.3;
+    margin: 0;
+}
+
 @media (max-width: 800px) {
-    .admin { grid-template-columns: 1fr; }
+    .admin, .grid-form-2 { grid-template-columns: 1fr; }
     .admin-menu { grid-auto-flow: column; position: static; overflow-x: auto; }
 }

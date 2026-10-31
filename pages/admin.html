@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración · KAREN-FLIX</title>
+
+    <!-- Hojas de estilo -->
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <!-- Navegación global -->
+    <div id="navbar"></div>
+
+    <main class="contenedor" id="contenido-admin">
+        <!-- Encabezado de la vista -->
+        <header class="admin-banner">
+            <p class="eyebrow">Panel de administración</p>
+            <p class="muted">Gestiona categorías, películas y propuestas. Los permisos reales los valida el backend.</p>
+        </header>
+
+        <div class="admin">
+            <!-- Barra de navegación por pestañas -->
+            <nav class="admin-menu" aria-label="Secciones del panel" role="tablist">
+                <button 
+                    class="btn" 
+                    type="button" 
+                    role="tab"
+                    id="tab-pendientes"
+                    aria-controls="vista-pendientes" 
+                    aria-selected="true" 
+                    data-vista="pendientes">
+                    Pendientes <span class="contador" id="stat-pendientes">0</span>
+                </button>
+                <button 
+                    class="btn" 
+                    type="button" 
+                    role="tab"
+                    id="tab-peliculas"
+                    aria-controls="vista-peliculas" 
+                    aria-selected="false" 
+                    data-vista="peliculas">
+                    Películas <span class="contador" id="stat-peliculas">0</span>
+                </button>
+                <button 
+                    class="btn" 
+                    type="button" 
+                    role="tab"
+                    id="tab-categorias"
+                    aria-controls="vista-categorias" 
+                    aria-selected="false" 
+                    data-vista="categorias">
+                    Categorías <span class="contador" id="stat-categorias">0</span>
+                </button>
+            </nav>
+
+            <!-- Contenedor de paneles -->
+            <div class="admin-contenido">
+                <!-- Sección: Pendientes -->
+                <section 
+                    class="vista" 
+                    id="vista-pendientes" 
+                    role="tabpanel" 
+                    aria-labelledby="tab-pendientes">
+                    <h1 class="titulo-seccion">Propuestas pendientes</h1>
+                    <div id="tabla-pendientes"></div>
+                </section>
+
+                <!-- Sección: Películas -->
+                <section 
+                    class="vista" 
+                    id="vista-peliculas" 
+                    role="tabpanel" 
+                    aria-labelledby="tab-peliculas" 
+                    hidden>
+                    <div class="admin-cabecera">
+                        <h1 class="titulo-seccion">Películas y series</h1>
+                        <button class="btn btn-primario" type="button" data-accion="nueva-pelicula">
+                            + Nueva película
+                        </button>
+                    </div>
+                    <div id="tabla-peliculas"></div>
+                </section>
+
+                <!-- Sección: Categorías -->
+                <section 
+                    class="vista" 
+                    id="vista-categorias" 
+                    role="tabpanel" 
+                    aria-labelledby="tab-categorias" 
+                    hidden>
+                    <div class="admin-cabecera">
+                        <h1 class="titulo-seccion">Categorías</h1>
+                        <button class="btn btn-primario" type="button" data-accion="nueva-categoria">
+                            + Nueva categoría
+                        </button>
+                    </div>
+                    <div id="tabla-categorias"></div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal: Categoría -->
+    <dialog id="dlg-categoria" aria-labelledby="titulo-dlg-categoria">
+        <form id="form-categoria" method="dialog" novalidate>
+            <h2 id="titulo-dlg-categoria">Nueva categoría</h2>
+
+            <div class="campo">
+                <label for="c-nombre">Nombre <span aria-hidden="true">*</span></label>
+                <input id="c-nombre" name="nombre" type="text" maxlength="50" required>
+            </div>
+
+            <div class="campo">
+                <label for="c-desc">Descripción</label>
+                <textarea id="c-desc" name="descripcion" rows="3" maxlength="200"></textarea>
+            </div>
+
+            <p class="error-campo" id="error-categoria" role="alert" aria-live="polite"></p>
+
+            <div class="acciones">
+                <button class="btn btn-primario" type="submit">Guardar</button>
+                <button class="btn" type="button" data-cerrar="dlg-categoria">Cancelar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Modal: Película -->
+    <dialog id="dlg-pelicula" aria-labelledby="titulo-dlg-pelicula">
+        <form id="form-pelicula" method="dialog" novalidate>
+            <h2 id="titulo-dlg-pelicula">Nueva película</h2>
+
+            <div class="campo">
+                <label for="p-titulo">Título <span aria-hidden="true">*</span></label>
+                <input id="p-titulo" name="titulo" type="text" maxlength="120" required>
+            </div>
+
+            <div class="campo">
+                <label for="p-desc">Descripción <span aria-hidden="true">*</span></label>
+                <textarea id="p-desc" name="descripcion" rows="3" required></textarea>
+            </div>
+
+            <div class="grid-form-2">
+                <div class="campo">
+                    <label for="p-tipo">Tipo</label>
+                    <select id="p-tipo" name="tipo">
+                        <option value="pelicula">Película</option>
+                        <option value="serie">Serie</option>
+                        <option value="anime">Anime</option>
+                        <option value="documental">Documental</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="p-anio">Año <span aria-hidden="true">*</span></label>
+                    <input id="p-anio" name="anio" type="number" min="1900" max="2100" required>
+                </div>
+            </div>
+
+            <div class="grid-form-2">
+                <div class="campo">
+                    <label for="p-duracion">Duración (minutos)</label>
+                    <input id="p-duracion" name="duracion_minutos" type="number" min="1" max="600" placeholder="Ej: 120">
+                </div>
+                <div class="campo">
+                    <label for="p-categoria">Categoría <span aria-hidden="true">*</span></label>
+                    <select id="p-categoria" name="categoria_id" required>
+                        <option value="" disabled selected>Selecciona una categoría</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="p-director">Director</label>
+                <input id="p-director" name="director" type="text" maxlength="150" placeholder="Ej: Christopher Nolan">
+            </div>
+
+            <div class="campo">
+                <label for="p-actores">Actores (separados por coma)</label>
+                <input id="p-actores" name="actores" type="text" maxlength="255" placeholder="Ej: Leonardo DiCaprio, Joseph Gordon-Levitt">
+            </div>
+
+            <div class="campo">
+                <label for="p-trailer">Enlace de Tráiler (YouTube)</label>
+                <input id="p-trailer" name="trailer_url" type="url" placeholder="https://www.youtube.com/watch?v=...">
+            </div>
+
+            <div class="campo">
+                <label for="p-cuevana">Enlace alternativo (opcional)</label>
+                <input id="p-cuevana" name="cuevana_url" type="url" placeholder="https://...">
+            </div>
+
+            <!-- HU-17: Subida y visualización de pósters en vivo -->
+            <div class="campo">
+                <label for="p-imagen">URL del Póster (Imagen) <span aria-hidden="true">*</span></label>
+                <input id="p-imagen" name="imagen_url" type="url" placeholder="https://image.tmdb.org/t/p/... o enlace web" required>
+            </div>
+
+            <div class="poster-preview-wrap">
+                <span class="preview-label">Previsualización del póster:</span>
+                <div class="poster-preview-box">
+                    <img id="p-poster-preview" src="" alt="Previsualización del póster" class="poster-preview-img" hidden>
+                    <p id="p-poster-placeholder" class="poster-placeholder">Ingresa una URL de imagen válida para previsualizar</p>
+                </div>
+            </div>
+
+            <p class="error-campo" id="error-pelicula" role="alert" aria-live="polite"></p>
+
+            <div class="acciones">
+                <button class="btn btn-primario" type="submit">Guardar</button>
+                <button class="btn" type="button" data-cerrar="dlg-pelicula">Cancelar</button>
+            </div>
+        </form>
+    </dialog>
+    <!-- Modal de Aprobación de Propuestas -->
+    <dialog id="dlg-aprobar" aria-labelledby="titulo-dlg-aprobar">
+        <form id="form-aprobar" novalidate>
+            <h2 id="titulo-dlg-aprobar">Aprobar película propuesta</h2>
+            <p class="muted" id="subtitulo-dlg-aprobar">Ingresa o valida el enlace para ver en Cuevana antes de publicarla.</p>
+            <div class="campo">
+                <label for="ap-cuevana">Enlace de Cuevana (opcional)</label>
+                <input id="ap-cuevana" name="cuevana_url" type="url" placeholder="https://cuevana... (dejar vacío si no está disponible)">
+            </div>
+            <p class="error-campo" id="error-aprobar" role="alert"></p>
+            <div class="acciones">
+                <button class="btn btn-ok" type="submit">Aprobar y Notificar</button>
+                <button class="btn" type="button" data-cerrar="dlg-aprobar">Cancelar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Scripts -->
+    <script type="module" src="../js/pages/admin.js"></script>
+</body>
+</html>

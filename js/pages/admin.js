@@ -9,16 +9,15 @@ const $ = (id) => document.getElementById(id);
 const datos = { categorias: [], peliculas: [], pendientes: [] };
 let propuestaSeleccionada = null;
 
-// ---------- Plantillas de tabla ----------
+// ---------- Funciones de Utilidad y Búsqueda ----------
+const buscar = (lista, id) => lista.find((x) => x.id === Number(id));
+
+const idCategoria = (p) =>
+    p.categoria_id ?? datos.categorias.find((c) => c.nombre === p.categoria)?.id ?? '';
+
+// ---------- Plantillas HTML ----------
 const boton = (accion, id, texto, clase = '') =>
-    `<button class="btn btn-sm ${clase}" type="button" data-accion="${accion}" data-id="${id}">${texto}</button>`;
-
-const fila = (celdas, botones) =>
-    `<tr>${celdas.map((c) => `<td>${c}</td>`).join('')}<td class="acciones-fila">${botones}</td></tr>`;
-
-const tabla = (cabeceras, filas, textoVacio) => {
-    if (!filas.length) return estadoVacio(textoVacio);
-    const encabezado = [...cabeceras, 'Acciones'].map((h) => `<th>${h}</th>`).join('');
+    `<button class="btn btn-sm ${clase}" type="button" data-accion="${accion}" data-id="${id}">${texto}</button>`;  const fila = (celdas, botones) => `<tr>${celdas.map((c) => `<td>${c}</td>`).join('')}<td class="acciones-fila">${botones}</td></tr>`;  const tabla = (cabeceras, filas, textoVacio) => { if (!filas.length) return estadoVacio(textoVacio); const encabezado = [...cabeceras, 'Acciones'].map((h) => `<th>${h}</th>`).join('');
     return `<div class="tabla-wrap"><table><thead><tr>${encabezado}</tr></thead><tbody>${filas.join('')}</tbody></table></div>`;
 };
 
@@ -30,8 +29,7 @@ const celdaTituloConPoster = (p) => {
     return `<div class="celda-pelicula-info">
                 ${thumb}
                 <div>
-                    <strong>${escapar(p.titulo)}</strong>
-                    ${p.director ? `<div class="muted" style="font-size:0.78rem;">Dir. ${escapar(p.director)}</div>` : ''}
+                    <strong>${escapar(p.titulo)}</strong>${p.director ? `<div class="muted" style="font-size:0.78rem;">Dir. ${escapar(p.director)}</div>` : ''}
                 </div>
             </div>`;
 };
@@ -43,12 +41,13 @@ const celdasPelicula = (p) => [
     escapar(p.categoria)
 ];
 
-// ---------- Pintado ----------
+// ---------- Renderizado ----------
 const pintar = () => {
     $('stat-pendientes').textContent = datos.pendientes.length;
     $('stat-peliculas').textContent = datos.peliculas.length;
     $('stat-categorias').textContent = datos.categorias.length;
 
+    // Tabla de propuestas pendientes
     $('tabla-pendientes').innerHTML = tabla(
         ['Película propuesta', 'Tipo', 'Año', 'Categoría'],
         datos.pendientes.map((p) =>
@@ -61,24 +60,12 @@ const pintar = () => {
         'No hay propuestas pendientes de moderación en este momento.'
     );
 
+    // Tabla del catálogo principal
     $('tabla-peliculas').innerHTML = tabla(
         ['Título en cartelera', 'Tipo', 'Año', 'Categoría', 'Calificación'],
         datos.peliculas.map((p) =>
             fila(
-                [...celdasPelicula(p), `<span class="score">★ ${Number(p.rating_promedio || 0).toFixed(1)}</span>`],
-                boton('editar-pelicula', p.id, 'Editar') +
-                    boton('eliminar-pelicula', p.id, 'Eliminar', 'btn-peligro')
-            )
-        ),
-        'Aún no hay películas aprobadas en el catálogo.'
-    );
-
-    $('tabla-categorias').innerHTML = tabla(
-        ['Nombre de categoría', 'Descripción', 'Títulos'],
-        datos.categorias.map((c) =>
-            fila(
-                [
-                    `<strong>${escapar(c.nombre)}</strong>`,
+                [...celdasPelicula(p), `<span class="score">★ ${Number(p.rating_promedio \vert{}\vert{} 0).toFixed(1)}</span>`], boton('editar-pelicula', p.id, 'Editar') + boton('eliminar-pelicula', p.id, 'Eliminar', 'btn-peligro') ) ), 'Aún no hay películas aprobadas en el catálogo.' );  // Tabla de categorías $('tabla-categorias').innerHTML = tabla( ['Nombre de categoría', 'Descripción', 'Títulos'], datos.categorias.map((c) => fila( [ `<strong>${escapar(c.nombre)}</strong>`,
                     escapar(c.descripcion || '—'),
                     `<span class="badge-tabla">${c.total_peliculas ?? 0}</span>`
                 ],
@@ -89,9 +76,14 @@ const pintar = () => {
         'Aún no hay categorías registradas.'
     );
 
-    $('p-categoria').innerHTML = datos.categorias
-        .map((c) => `<option value="${c.id}">${escapar(c.nombre)}</option>`)
-        .join('');
+    // Selector de categorías en formulario de película
+    const selectCat = $('p-categoria');
+    if (selectCat) {
+        selectCat.innerHTML = `
+            <option value="" disabled selected>Selecciona una categoría</option>
+            ${datos.categorias.map((c) => `<option value="${c.id}">${escapar(c.nombre)}</option>`).join('')}
+        `;
+    }
 };
 
 const cargarTodo = async () => {
@@ -120,9 +112,12 @@ const mostrarVista = (vista) => {
     document.querySelectorAll('.vista').forEach((s) => (s.hidden = s.id !== `vista-${vista}`));
 };
 
+// ---------- HU-17: Previsualización de Póster ----------
 const actualizarPreviewPoster = (url) => {
     const img = $('p-poster-preview');
     const ph = $('p-poster-placeholder');
+    if (!img || !ph) return;
+
     if (!url || !url.trim().startsWith('http')) {
         img.hidden = true;
         img.src = '';
@@ -130,6 +125,7 @@ const actualizarPreviewPoster = (url) => {
         ph.textContent = 'Ingresa una URL de imagen válida para previsualizar';
         return;
     }
+
     img.src = url.trim();
     img.onload = () => {
         img.hidden = false;
@@ -142,15 +138,14 @@ const actualizarPreviewPoster = (url) => {
     };
 };
 
-const idCategoria = (p) =>
-    p.categoria_id ?? datos.categorias.find((c) => c.nombre === p.categoria)?.id ?? '';
-
+// ---------- Modales ----------
 const abrirCategoria = (categoria) => {
     const form = $('form-categoria');
     form.reset();
     form.dataset.id = categoria?.id ?? '';
     $('titulo-dlg-categoria').textContent = categoria ? 'Editar categoría' : 'Nueva categoría';
     $('error-categoria').textContent = '';
+
     if (categoria) {
         form.nombre.value = categoria.nombre;
         form.descripcion.value = categoria.descripcion || '';
@@ -164,6 +159,7 @@ const abrirPelicula = (pelicula) => {
     form.dataset.id = pelicula?.id ?? '';
     $('titulo-dlg-pelicula').textContent = pelicula ? 'Editar película' : 'Nueva película en cartelera';
     $('error-pelicula').textContent = '';
+
     if (pelicula) {
         form.titulo.value = pelicula.titulo || '';
         form.descripcion.value = pelicula.descripcion || '';
@@ -176,7 +172,7 @@ const abrirPelicula = (pelicula) => {
             ? pelicula.actores.map((a) => (typeof a === 'object' ? a.nombre : a)).join(', ')
             : pelicula.actores || '';
         form.trailer_url.value = pelicula.trailer_url || '';
-        form.cuevana_url.value = pelicula.cuevana_url || '';
+        if (form.cuevana_url) form.cuevana_url.value = pelicula.cuevana_url || '';
         form.imagen_url.value = pelicula.imagen_url || '';
         actualizarPreviewPoster(pelicula.imagen_url);
     } else {
@@ -188,20 +184,18 @@ const abrirPelicula = (pelicula) => {
 const abrirModalAprobar = (id) => {
     propuestaSeleccionada = buscar(datos.pendientes, id);
     if (!propuestaSeleccionada) return;
+
+    const dlgAprobar = $('dlg-aprobar');
+    if (!dlgAprobar) {
+        // Fallback en caso de que la vista no tenga el modal implementado en el DOM
+        cambiarEstado(id, 'aprobada', 'Película aprobada y publicada en el catálogo');
+        return;
+    }
+
     const form = $('form-aprobar');
     form.reset();
     $('error-aprobar').textContent = '';
-    $('subtitulo-dlg-aprobar').textContent = `Película: "${propuestaSeleccionada.titulo}"`;
-    form.cuevana_url.value = propuestaSeleccionada.cuevana_url || '';
-    $('dlg-aprobar').showModal();
-};
-
-const guardar = async (form, ruta, cuerpo, idError, idDialogo) => {
-    const id = form.dataset.id;
-    try {
-        const res = await (id ? api.put(`${ruta}/${id}`, cuerpo) : api.post(ruta, cuerpo));
-        if (!id && ruta === '/peliculas' && res?.datos?.id && res?.datos?.estado === 'pendiente') {
-            await api.patch(`/peliculas/admin/${res.datos.id}/estado`, { estado: 'aprobada' }).catch(() => {});
+    $('subtitulo-dlg-aprobar').textContent = `Película: "${propuestaSeleccionada.titulo}"`; if ($('ap-cuevana')) { $('ap-cuevana').value = propuestaSeleccionada.cuevana_url \vert{}\vert{} ''; } dlgAprobar.showModal(); };  const guardar = async (form, ruta, cuerpo, idError, idDialogo) => { const id = form.dataset.id; try { const res = await (id ? api.put(`${ruta}/${id}`, cuerpo) : api.post(ruta, cuerpo)); if (!id && ruta === '/peliculas' && res?.datos?.id && res?.datos?.estado === 'pendiente') { await api.patch(`/peliculas/admin/${res.datos.id}/estado`, { estado: 'aprobada' }).catch(() => {});
         }
         $(idDialogo).close();
         toast(id ? 'Cambios guardados correctamente' : 'Registro creado con éxito');
@@ -211,7 +205,8 @@ const guardar = async (form, ruta, cuerpo, idError, idDialogo) => {
     }
 };
 
-$('form-categoria').addEventListener('submit', (e) => {
+// ---------- Controladores de Formularios ----------
+$('form-categoria')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const form = e.target;
     const nombre = form.nombre.value.trim();
@@ -227,10 +222,11 @@ $('form-categoria').addEventListener('submit', (e) => {
     );
 });
 
-$('form-pelicula').addEventListener('submit', (e) => {
+$('form-pelicula')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const form = e.target;
     const anio = Number(form.anio.value);
+
     if (form.titulo.value.trim().length < 2) {
         return ($('error-pelicula').textContent = 'Escribe un título válido (mínimo 2 caracteres).');
     }
@@ -262,7 +258,7 @@ $('form-pelicula').addEventListener('submit', (e) => {
             director: form.director.value.trim() || null,
             actores: actores.length ? actores : [],
             trailer_url: form.trailer_url.value.trim() || null,
-            cuevana_url: form.cuevana_url.value.trim() || null,
+            cuevana_url: form.cuevana_url?.value.trim() || null,
             imagen_url: form.imagen_url.value.trim() || null,
             aprobarDirecto: true
         },
@@ -271,106 +267,21 @@ $('form-pelicula').addEventListener('submit', (e) => {
     );
 });
 
-// Confirmar aprobación y notificar al usuario
 $('form-aprobar')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!propuestaSeleccionada) return;
-    const cuevanaUrl = $('ap-cuevana').value.trim();
+
+    const cuevanaUrl = $('ap-cuevana')?.value.trim();
 
     try {
-        // Actualiza el link de Cuevana si se ingresó uno
         if (cuevanaUrl) {
-            await api.patch(`/peliculas/${propuestaSeleccionada.id}`, { cuevana_url: cuevanaUrl }).catch(() => {});
-        }
+            await api.patch(`/peliculas/${propuestaSeleccionada.id}`, { cuevana_url: cuevanaUrl }).catch(() => {}); }  await api.patch(`/peliculas/admin/${propuestaSeleccionada.id}/estado`, { estado: 'aprobada' });
 
-        // Aprueba la película
-        await api.patch(`/peliculas/admin/${propuestaSeleccionada.id}/estado`, { estado: 'aprobada' });
-
-        // Notificar al usuario que propuso la película
         const usuarioCreadorId = propuestaSeleccionada.creado_por || propuestaSeleccionada.usuario_id;
-        agregarNotificacion({
-            titulo: '¡Tu propuesta ha sido aprobada!',
-            mensaje: `La película "${propuestaSeleccionada.titulo}" ya está publicada en el catálogo.`,
-            paraRol: 'usuario',
-            paraUsuarioId: usuarioCreadorId || null,
-            enlace: `pages/detalle.html?id=${propuestaSeleccionada.id}`
-        });
-
-        $('dlg-aprobar').close();
-        toast('Película aprobada, publicada y usuario notificado.');
-        propuestaSeleccionada = null;
-        await cargarTodo();
-    } catch (err) {
-        $('error-aprobar').textContent = err.message || 'Error al aprobar la propuesta.';
-    }
-});
-
-// ---------- Acciones de las tablas ----------
-const ejecutar = async (peticion, mensaje) => {
-    try {
-        await peticion();
-        toast(mensaje);
-        await cargarTodo();
-    } catch (error) {
-        toast(error.message, 'error');
-    }
-};
-
-const buscar = (lista, id) => lista.find((x) => x.id === Number(id));
-const cambiarEstado = (id, estado, mensaje) =>
-    ejecutar(() => api.patch(`/peliculas/admin/${id}/estado`, { estado }), mensaje);
-
-const acciones = {
-    'abrir-aprobar': (id) => abrirModalAprobar(id),
-    rechazar: (id) =>
-        confirmar('¿Rechazar esta propuesta?') && cambiarEstado(id, 'rechazada', 'Propuesta rechazada'),
-    'nueva-pelicula': () => abrirPelicula(),
-    'editar-pelicula': (id) => abrirPelicula(buscar(datos.peliculas, id)),
-    'eliminar-pelicula': (id) =>
-        confirmar('¿Eliminar esta película del catálogo? No se puede deshacer.') &&
-        ejecutar(() => api.delete(`/peliculas/${id}`), 'Película eliminada'),
-    'nueva-categoria': () => abrirCategoria(),
-    'editar-categoria': (id) => abrirCategoria(buscar(datos.categorias, id)),
-    'eliminar-categoria': (id) =>
-        confirmar('¿Eliminar esta categoría?') &&
-        ejecutar(() => api.delete(`/categorias/${id}`), 'Categoría eliminada')
-};
-
-const iniciar = () => {
-    if (!requireAdmin()) {
-        $('contenido-admin').innerHTML = estadoVacio(
-            'Acceso restringido: Esta sección es exclusiva para cuentas con rol Administrador. Redirigiendo...'
-        );
-        setTimeout(() => (location.href = '../index.html'), 1600);
-        return;
-    }
-
-    const adminUser = getUsuario();
-    const banner = document.querySelector('.admin-banner');
-    if (banner && adminUser) {
-        banner.innerHTML = `
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
-                <div>
-                    <p class="eyebrow">Panel de administración</p>
-                    <h2 style="margin:0.2rem 0;">Hola, ${escapar(adminUser.nombre)}</h2>
-                    <p class="muted">Gestiona categorías, películas en cartelera y propuestas enviadas por la comunidad.</p>
-                </div>
-                <span class="rol-badge rol-admin" style="font-size:0.76rem;padding:0.32rem 0.7rem;">Administrador</span>
-            </div>
-        `;
-    }
-
-    document
-        .querySelectorAll('[data-vista]')
-        .forEach((b) => b.addEventListener('click', () => mostrarVista(b.dataset.vista)));
-    document.addEventListener('click', (e) => {
-        const cerrar = e.target.closest('[data-cerrar]');
-        if (cerrar) return $(cerrar.dataset.cerrar).close();
-        const accion = e.target.closest('[data-accion]');
-        if (accion) acciones[accion.dataset.accion]?.(accion.dataset.id);
-    });
-    $('p-imagen').addEventListener('input', (e) => actualizarPreviewPoster(e.target.value));
-    cargarTodo();
-};
-
-iniciar();
+        if (typeof agregarNotificacion === 'function') {
+            agregarNotificacion({
+                titulo: '¡Tu propuesta ha sido aprobada!',
+                mensaje: `La película "${propuestaSeleccionada.titulo}" ya está publicada en el catálogo.`,
+                paraRol: 'usuario',
+                paraUsuarioId: usuarioCreadorId || null,
+                enlace: `pages/detalle.html?id=${
