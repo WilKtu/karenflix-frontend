@@ -17,7 +17,14 @@ const idCategoria = (p) =>
 
 // ---------- Plantillas HTML ----------
 const boton = (accion, id, texto, clase = '') =>
-    `<button class="btn btn-sm ${clase}" type="button" data-accion="${accion}" data-id="${id}">${texto}</button>`;  const fila = (celdas, botones) => `<tr>${celdas.map((c) => `<td>${c}</td>`).join('')}<td class="acciones-fila">${botones}</td></tr>`;  const tabla = (cabeceras, filas, textoVacio) => { if (!filas.length) return estadoVacio(textoVacio); const encabezado = [...cabeceras, 'Acciones'].map((h) => `<th>${h}</th>`).join('');
+    `<button class="btn btn-sm ${clase}" type="button" data-accion="${accion}" data-id="${id}">${texto}</button>`;
+
+const fila = (celdas, botones) =>
+    `<tr>${celdas.map((c) => `<td>${c}</td>`).join('')}<td class="acciones-fila">${botones}</td></tr>`;
+
+const tabla = (cabeceras, filas, textoVacio) => {
+    if (!filas.length) return estadoVacio(textoVacio);
+    const encabezado = [...cabeceras, 'Acciones'].map((h) => `<th>${h}</th>`).join('');
     return `<div class="tabla-wrap"><table><thead><tr>${encabezado}</tr></thead><tbody>${filas.join('')}</tbody></table></div>`;
 };
 
@@ -43,38 +50,61 @@ const celdasPelicula = (p) => [
 
 // ---------- Renderizado ----------
 const pintar = () => {
-    $('stat-pendientes').textContent = datos.pendientes.length;
-    $('stat-peliculas').textContent = datos.peliculas.length;
-    $('stat-categorias').textContent = datos.categorias.length;
+    if ($('stat-pendientes')) $('stat-pendientes').textContent = datos.pendientes.length;
+    if ($('stat-peliculas')) $('stat-peliculas').textContent = datos.peliculas.length;
+    if ($('stat-categorias')) $('stat-categorias').textContent = datos.categorias.length;
 
     // Tabla de propuestas pendientes
-    $('tabla-pendientes').innerHTML = tabla(
-        ['Película propuesta', 'Tipo', 'Año', 'Categoría'],
-        datos.pendientes.map((p) =>
-            fila(
-                celdasPelicula(p),
-                boton('abrir-aprobar', p.id, 'Aprobar', 'btn-ok') +
+    const elPendientes = $('tabla-pendientes');
+    if (elPendientes) {
+        elPendientes.innerHTML = tabla(
+            ['Película propuesta', 'Tipo', 'Año', 'Categoría'],
+            datos.pendientes.map((p) =>
+                fila(
+                    celdasPelicula(p),
+                    boton('abrir-aprobar', p.id, 'Aprobar', 'btn-ok') +
                     boton('rechazar', p.id, 'Rechazar', 'btn-peligro')
-            )
-        ),
-        'No hay propuestas pendientes de moderación en este momento.'
-    );
+                )
+            ),
+            'No hay propuestas pendientes de moderación en este momento.'
+        );
+    }
 
     // Tabla del catálogo principal
-    $('tabla-peliculas').innerHTML = tabla(
-        ['Título en cartelera', 'Tipo', 'Año', 'Categoría', 'Calificación'],
-        datos.peliculas.map((p) =>
-            fila(
-                [...celdasPelicula(p), `<span class="score">★ ${Number(p.rating_promedio \vert{}\vert{} 0).toFixed(1)}</span>`], boton('editar-pelicula', p.id, 'Editar') + boton('eliminar-pelicula', p.id, 'Eliminar', 'btn-peligro') ) ), 'Aún no hay películas aprobadas en el catálogo.' );  // Tabla de categorías $('tabla-categorias').innerHTML = tabla( ['Nombre de categoría', 'Descripción', 'Títulos'], datos.categorias.map((c) => fila( [ `<strong>${escapar(c.nombre)}</strong>`,
-                    escapar(c.descripcion || '—'),
-                    `<span class="badge-tabla">${c.total_peliculas ?? 0}</span>`
-                ],
-                boton('editar-categoria', c.id, 'Editar') +
+    const elPeliculas = $('tabla-peliculas');
+    if (elPeliculas) {
+        elPeliculas.innerHTML = tabla(
+            ['Título en cartelera', 'Tipo', 'Año', 'Categoría', 'Calificación'],
+            datos.peliculas.map((p) =>
+                fila(
+                    [...celdasPelicula(p), `<span class="score">★ ${Number(p.rating_promedio || 0).toFixed(1)}</span>`],
+                    boton('editar-pelicula', p.id, 'Editar') +
+                    boton('eliminar-pelicula', p.id, 'Eliminar', 'btn-peligro')
+                )
+            ),
+            'Aún no hay películas aprobadas en el catálogo.'
+        );
+    }
+
+    // Tabla de categorías
+    const elCategorias = $('tabla-categorias');
+    if (elCategorias) {
+        elCategorias.innerHTML = tabla(
+            ['Nombre de categoría', 'Descripción', 'Títulos'],
+            datos.categorias.map((c) =>
+                fila(
+                    [
+                        `<strong>${escapar(c.nombre)}</strong>`,
+                        escapar(c.descripcion || '—'),
+                        `<span class="badge-tabla">${c.total_peliculas ?? 0}</span>`
+                    ],
+                    boton('editar-categoria', c.id, 'Editar') +
                     boton('eliminar-categoria', c.id, 'Eliminar', 'btn-peligro')
-            )
-        ),
-        'Aún no hay categorías registradas.'
-    );
+                )
+            ),
+            'Aún no hay categorías registradas.'
+        );
+    }
 
     // Selector de categorías en formulario de película
     const selectCat = $('p-categoria');
@@ -141,24 +171,30 @@ const actualizarPreviewPoster = (url) => {
 // ---------- Modales ----------
 const abrirCategoria = (categoria) => {
     const form = $('form-categoria');
+    if (!form) return;
     form.reset();
     form.dataset.id = categoria?.id ?? '';
-    $('titulo-dlg-categoria').textContent = categoria ? 'Editar categoría' : 'Nueva categoría';
-    $('error-categoria').textContent = '';
+    if ($('titulo-dlg-categoria')) {
+        $('titulo-dlg-categoria').textContent = categoria ? 'Editar categoría' : 'Nueva categoría';
+    }
+    if ($('error-categoria')) $('error-categoria').textContent = '';
 
     if (categoria) {
-        form.nombre.value = categoria.nombre;
+        form.nombre.value = categoria.nombre || '';
         form.descripcion.value = categoria.descripcion || '';
     }
-    $('dlg-categoria').showModal();
+    $('dlg-categoria')?.showModal();
 };
 
 const abrirPelicula = (pelicula) => {
     const form = $('form-pelicula');
+    if (!form) return;
     form.reset();
     form.dataset.id = pelicula?.id ?? '';
-    $('titulo-dlg-pelicula').textContent = pelicula ? 'Editar película' : 'Nueva película en cartelera';
-    $('error-pelicula').textContent = '';
+    if ($('titulo-dlg-pelicula')) {
+        $('titulo-dlg-pelicula').textContent = pelicula ? 'Editar película' : 'Nueva película en cartelera';
+    }
+    if ($('error-pelicula')) $('error-pelicula').textContent = '';
 
     if (pelicula) {
         form.titulo.value = pelicula.titulo || '';
@@ -178,7 +214,20 @@ const abrirPelicula = (pelicula) => {
     } else {
         actualizarPreviewPoster('');
     }
-    $('dlg-pelicula').showModal();
+    $('dlg-pelicula')?.showModal();
+};
+
+const cambiarEstado = async (id, estado, mensajeExito) => {
+    loader(true);
+    try {
+        await api.patch(`/peliculas/admin/${id}/estado`, { estado });
+        toast(mensajeExito);
+        await cargarTodo();
+    } catch (error) {
+        toast(error.message, 'error');
+    } finally {
+        loader(false);
+    }
 };
 
 const abrirModalAprobar = (id) => {
@@ -187,21 +236,34 @@ const abrirModalAprobar = (id) => {
 
     const dlgAprobar = $('dlg-aprobar');
     if (!dlgAprobar) {
-        // Fallback en caso de que la vista no tenga el modal implementado en el DOM
         cambiarEstado(id, 'aprobada', 'Película aprobada y publicada en el catálogo');
         return;
     }
 
     const form = $('form-aprobar');
-    form.reset();
-    $('error-aprobar').textContent = '';
-    $('subtitulo-dlg-aprobar').textContent = `Película: "${propuestaSeleccionada.titulo}"`; if ($('ap-cuevana')) { $('ap-cuevana').value = propuestaSeleccionada.cuevana_url \vert{}\vert{} ''; } dlgAprobar.showModal(); };  const guardar = async (form, ruta, cuerpo, idError, idDialogo) => { const id = form.dataset.id; try { const res = await (id ? api.put(`${ruta}/${id}`, cuerpo) : api.post(ruta, cuerpo)); if (!id && ruta === '/peliculas' && res?.datos?.id && res?.datos?.estado === 'pendiente') { await api.patch(`/peliculas/admin/${res.datos.id}/estado`, { estado: 'aprobada' }).catch(() => {});
+    if (form) form.reset();
+    if ($('error-aprobar')) $('error-aprobar').textContent = '';
+    if ($('subtitulo-dlg-aprobar')) {
+        $('subtitulo-dlg-aprobar').textContent = `Película: "${propuestaSeleccionada.titulo}"`;
+    }
+    if ($('ap-cuevana')) {
+        $('ap-cuevana').value = propuestaSeleccionada.cuevana_url || '';
+    }
+    dlgAprobar.showModal();
+};
+
+const guardar = async (form, ruta, cuerpo, idError, idDialogo) => {
+    const id = form.dataset.id;
+    try {
+        const res = await (id ? api.put(`${ruta}/${id}`, cuerpo) : api.post(ruta, cuerpo));
+        if (!id && ruta === '/peliculas' && res?.datos?.id && res?.datos?.estado === 'pendiente') {
+            await api.patch(`/peliculas/admin/${res.datos.id}/estado`, { estado: 'aprobada' }).catch(() => {});
         }
-        $(idDialogo).close();
+        $(idDialogo)?.close();
         toast(id ? 'Cambios guardados correctamente' : 'Registro creado con éxito');
         await cargarTodo();
     } catch (error) {
-        $(idError).textContent = error.message;
+        if ($(idError)) $(idError).textContent = error.message;
     }
 };
 
@@ -275,13 +337,75 @@ $('form-aprobar')?.addEventListener('submit', async (e) => {
 
     try {
         if (cuevanaUrl) {
-            await api.patch(`/peliculas/${propuestaSeleccionada.id}`, { cuevana_url: cuevanaUrl }).catch(() => {}); }  await api.patch(`/peliculas/admin/${propuestaSeleccionada.id}/estado`, { estado: 'aprobada' });
+            await api.patch(`/peliculas/${propuestaSeleccionada.id}`, { cuevana_url: cuevanaUrl }).catch(() => {});
+        }
+        await api.patch(`/peliculas/admin/${propuestaSeleccionada.id}/estado`, { estado: 'aprobada' });
 
         const usuarioCreadorId = propuestaSeleccionada.creado_por || propuestaSeleccionada.usuario_id;
         if (typeof agregarNotificacion === 'function') {
-            agregarNotificacion({
+            await agregarNotificacion({
                 titulo: '¡Tu propuesta ha sido aprobada!',
                 mensaje: `La película "${propuestaSeleccionada.titulo}" ya está publicada en el catálogo.`,
                 paraRol: 'usuario',
                 paraUsuarioId: usuarioCreadorId || null,
-                enlace: `pages/detalle.html?id=${
+                enlace: `pages/detalle.html?id=${propuestaSeleccionada.id}`
+            }).catch(() => {});
+        }
+
+        $('dlg-aprobar')?.close();
+        toast('Película aprobada con éxito');
+        await cargarTodo();
+    } catch (error) {
+        if ($('error-aprobar')) $('error-aprobar').textContent = error.message;
+    }
+});
+
+// Listener reactivo para previsualización de póster
+$('p-imagen')?.addEventListener('input', (e) => actualizarPreviewPoster(e.target.value));
+
+// Delegación de eventos para botones de tablas y navegación
+document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-accion]');
+    if (!btn) return;
+
+    const { accion, id } = btn.dataset;
+
+    if (accion === 'abrir-aprobar') {
+        abrirModalAprobar(id);
+    } else if (accion === 'rechazar') {
+        const ok = await confirmar('¿Estás seguro de rechazar esta propuesta?');
+        if (ok) cambiarEstado(id, 'rechazada', 'Propuesta rechazada');
+    } else if (accion === 'editar-pelicula') {
+        const pelicula = buscar(datos.peliculas, id);
+        if (pelicula) abrirPelicula(pelicula);
+    } else if (accion === 'eliminar-pelicula') {
+        const ok = await confirmar('¿Deseas eliminar esta película del catálogo?');
+        if (ok) {
+            try {
+                await api.delete(`/peliculas/${id}`);
+                toast('Película eliminada');
+                await cargarTodo();
+            } catch (err) {
+                toast(err.message, 'error');
+            }
+        }
+    } else if (accion === 'editar-categoria') {
+        const cat = buscar(datos.categorias, id);
+        if (cat) abrirCategoria(cat);
+    } else if (accion === 'eliminar-categoria') {
+        const ok = await confirmar('¿Deseas eliminar esta categoría?');
+        if (ok) {
+            try {
+                await api.delete(`/categorias/${id}`);
+                toast('Categoría eliminada');
+                await cargarTodo();
+            } catch (err) {
+                toast(err.message, 'error');
+            }
+        }
+    }
+});
+
+// Inicialización protegida
+requireAdmin();
+cargarTodo();
