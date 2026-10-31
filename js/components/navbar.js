@@ -102,8 +102,7 @@ const inyectarBannerCookies = () => {
     banner.innerHTML = `
         <div class="contenedor banner-cookies-fila">
             <p>
-                <strong>Cookies y sesión segura (JWT):</strong>
-                Utilizamos la cookie <code>karenflix_token</code> y tokens JWT firmados para autenticar tu cuenta de forma segura.
+                Utilizamos cookies esenciales para mantener tu sesión activa de forma segura y recordar tus preferencias en KAREN-FLIX.
             </p>
             <div class="banner-cookies-acciones">
                 <button class="btn btn-sm btn-primario" id="btn-aceptar-cookies" type="button">Aceptar cookies</button>
@@ -171,14 +170,6 @@ const inyectarModalesGlobales = () => {
                 <div class="campo">
                     <label for="perf-bio">Biografía corta</label>
                     <textarea id="perf-bio" name="bio" rows="2" maxlength="180" placeholder="Cuéntanos qué tipo de películas te gustan...">${escapar(usuario.bio || '')}</textarea>
-                </div>
-
-                <div class="jwt-info-box">
-                    <span class="eyebrow" style="font-size:0.68rem;">Seguridad de sesión activa</span>
-                    <p class="muted" style="font-size:0.76rem;margin-top:0.2rem;">
-                        Cookie: <code>karenflix_token</code> (SameSite=Lax) · Expira: <strong>${escapar(expiraTexto)}</strong><br>
-                        JWT (HS256): <code>${escapar(tokenActual.slice(0, 36))}...</code>
-                    </p>
                 </div>
 
                 <p class="error-campo" id="error-perfil-global" role="alert"></p>
