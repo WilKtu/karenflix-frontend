@@ -1,6 +1,5 @@
 import { CONFIG } from './config.js';
 import { getToken } from './auth.js';
-import { demo } from './demo.js';
 
 const adaptarResena = (r) => {
     if (!r || typeof r !== 'object') return r;
@@ -49,8 +48,6 @@ const adaptarRespuesta = (json) => {
 };
 
 const pedir = async (metodo, ruta, cuerpo) => {
-    if (CONFIG.USAR_DEMO) return demo(metodo, ruta, cuerpo);
-
     const cabeceras = { 'Content-Type': 'application/json' };
     const token = getToken();
     if (token) cabeceras.Authorization = `Bearer ${token}`;
