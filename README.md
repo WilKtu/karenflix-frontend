@@ -2,11 +2,13 @@
 
 [![App en Vivo](https://img.shields.io/badge/Vercel-App_en_Vivo-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://karenflix-frontend.vercel.app)
 [![API Swagger Docs](https://img.shields.io/badge/Swagger-Documentación_API-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)](https://karenflix-backend.vercel.app/api-docs)
+[![Video Demostrativo](https://img.shields.io/badge/Google_Drive-Video_Demostrativo_HD-4285F4?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1HSiNq5PU6jD3jWmLozYrz2bn8PvheCkM?usp=sharing)
 [![GitHub Projects](https://img.shields.io/badge/SCRUM-GitHub_Projects_Kanban-1F883D?style=for-the-badge&logo=github&logoColor=white)](https://github.com/users/barriosevelyn488-web/projects/1)
 [![Repositorio Backend](https://img.shields.io/badge/Backend-Repositorio_Oficial-00599C?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://github.com/barriosevelyn488-web/Karenflix_backend)
 
 > **Aplicación en Producción:** [https://karenflix-frontend.vercel.app](https://karenflix-frontend.vercel.app)  
 > **Backend y Swagger UI:** [https://karenflix-backend.vercel.app/api-docs](https://karenflix-backend.vercel.app/api-docs)  
+> **Video Demostrativo Oficial (Google Drive):** [https://drive.google.com/drive/folders/1HSiNq5PU6jD3jWmLozYrz2bn8PvheCkM?usp=sharing](https://drive.google.com/drive/folders/1HSiNq5PU6jD3jWmLozYrz2bn8PvheCkM?usp=sharing)  
 > **Tablero de Gestión SCRUM (GitHub Projects):** [https://github.com/users/barriosevelyn488-web/projects/1](https://github.com/users/barriosevelyn488-web/projects/1)  
 > **Equipo de Desarrollo:** Evelyn Barrios (Scrum Master) & Wilder Katu (Product Owner)  
 > **Docentes Evaluadores:** Eduin Salas & Andre Lopez · Campuslands 2026
