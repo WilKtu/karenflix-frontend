@@ -64,8 +64,7 @@ const pedir = async (metodo, ruta, cuerpo) => {
             body: cuerpo ? JSON.stringify(cuerpo) : undefined
         });
     } catch {
-        // Si el servidor backend local/Aiven aún no está encendido, usa el motor persistente local
-        return demo(metodo, ruta, cuerpo);
+        throw new Error('No se pudo conectar con el servidor. Intenta de nuevo en unos segundos.');
     }
 
     const json = await respuesta.json().catch(() => ({}));
